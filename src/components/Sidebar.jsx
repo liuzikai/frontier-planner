@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useStore } from '../store/useStore';
 
 const Sidebar = () => {
@@ -12,6 +12,7 @@ const Sidebar = () => {
   });
 
   const selectedNodeData = nodes.find((node) => node.id === selectedNode);
+  const debounceTimerRef = useRef(null);
 
   useEffect(() => {
     if (selectedNodeData) {
@@ -29,10 +30,26 @@ const Sidebar = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     
+    // Debounce the updateTask call so rapid typing only creates one history entry
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    
     if (selectedNode) {
-      updateTask(selectedNode, { [name]: value });
+      debounceTimerRef.current = setTimeout(() => {
+        updateTask(selectedNode, { [name]: value });
+      }, 500); // Wait 500ms after last keystroke before saving to history
     }
   }, [selectedNode, updateTask]);
+
+  // Cleanup debounce timer on unmount or when node changes
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [selectedNode]);
 
   const handleClose = () => {
     setSelectedNode(null);
