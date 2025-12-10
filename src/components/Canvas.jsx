@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import {
   ReactFlow,
   Controls,
@@ -6,7 +6,7 @@ import {
   Background,
   BackgroundVariant,
 } from '@xyflow/react';
-import { useStore } from '../store/useStore';
+import { useStore, useTemporalStore } from '../store/useStore';
 import TaskNode from './TaskNode';
 import Toolbar from './Toolbar';
 import Sidebar from './Sidebar';
@@ -29,12 +29,46 @@ const Canvas = () => {
   const {
     nodes,
     edges,
+    selectedNode,
     onNodesChange,
     onEdgesChange,
     onConnect,
     addTask,
     setSelectedNode,
+    onNodeDragStart,
+    onNodeDragStop,
   } = useStore();
+
+  const undo = useTemporalStore((state) => state.undo);
+  const redo = useTemporalStore((state) => state.redo);
+
+  // Sync our selectedNode with React Flow's selection state
+  const nodesWithSelection = nodes.map((node) => ({
+    ...node,
+    selected: node.id === selectedNode,
+  }));
+
+  // Keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Check for Cmd/Ctrl + Z (undo) or Cmd/Ctrl + Shift + Z / Cmd/Ctrl + Y (redo)
+      if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          redo();
+        } else {
+          undo();
+        }
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === 'y') {
+        e.preventDefault();
+        redo();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [undo, redo]);
 
   // Handle double-click to add new task
   const handlePaneDoubleClick = useCallback(
@@ -55,19 +89,30 @@ const Canvas = () => {
     setSelectedNode(null);
   }, [setSelectedNode]);
 
+  // Handle node click to select
+  const handleNodeClick = useCallback(
+    (event, node) => {
+      setSelectedNode(node.id);
+    },
+    [setSelectedNode]
+  );
+
   return (
     <div className="flex h-screen w-full">
       {/* Main Canvas */}
       <div className="flex-1 relative">
         <Toolbar />
         <ReactFlow
-          nodes={nodes}
+          nodes={nodesWithSelection}
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onPaneClick={handlePaneClick}
+          onNodeClick={handleNodeClick}
           onDoubleClick={handlePaneDoubleClick}
+          onNodeDragStart={onNodeDragStart}
+          onNodeDragStop={onNodeDragStop}
           nodeTypes={nodeTypes}
           defaultEdgeOptions={defaultEdgeOptions}
           fitView
@@ -109,6 +154,7 @@ const Canvas = () => {
             <li>• <strong>Drag</strong> tasks to reposition</li>
             <li>• <strong>Connect</strong> handles to create dependencies</li>
             <li>• <strong>Click</strong> task to edit details</li>
+            <li>• <strong>Ctrl/⌘+Z</strong> undo, <strong>Ctrl/⌘+Shift+Z</strong> redo</li>
           </ul>
         </div>
       </div>

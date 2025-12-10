@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useStore } from '../store/useStore';
 
 const Sidebar = () => {
@@ -25,14 +25,14 @@ const Sidebar = () => {
     }
   }, [selectedNodeData]);
 
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     
     if (selectedNode) {
       updateTask(selectedNode, { [name]: value });
     }
-  };
+  }, [selectedNode, updateTask]);
 
   const handleClose = () => {
     setSelectedNode(null);
