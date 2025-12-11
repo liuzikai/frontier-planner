@@ -1,7 +1,7 @@
 import { useStore } from '../store/useStore';
 import { useTemporalStore } from '../store/useStore';
 
-const Toolbar = () => {
+const Toolbar = ({ getViewportCenter }) => {
   const { addTask, clearAll, resetToDemo, nodes, saveToFile, loadFromFile, currentFileName } = useStore();
   
   // Subscribe to temporal store reactively
@@ -11,11 +11,8 @@ const Toolbar = () => {
   const futureStates = useTemporalStore((state) => state.futureStates);
 
   const handleAddTask = () => {
-    // Add task at a random position in the viewport
-    const position = {
-      x: Math.random() * 400 + 100,
-      y: Math.random() * 300 + 100,
-    };
+    // Add task at the center of the current viewport
+    const position = getViewportCenter();
     addTask(position);
   };
 

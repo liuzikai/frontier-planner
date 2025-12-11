@@ -5,6 +5,7 @@ import {
   MiniMap,
   Background,
   BackgroundVariant,
+  useReactFlow,
 } from '@xyflow/react';
 import { useStore, useTemporalStore } from '../store/useStore';
 import TaskNode from './TaskNode';
@@ -41,6 +42,9 @@ const Canvas = () => {
 
   const undo = useTemporalStore((state) => state.undo);
   const redo = useTemporalStore((state) => state.redo);
+  
+  // Get React Flow instance to access viewport
+  const reactFlowInstance = useReactFlow();
 
   // Sync our selectedNode with React Flow's selection state
   const nodesWithSelection = nodes.map((node) => ({
@@ -69,6 +73,30 @@ const Canvas = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [undo, redo]);
+
+  // Get center of current viewport for adding new tasks
+  const getViewportCenter = useCallback(() => {
+    if (!reactFlowInstance) {
+      // Fallback if React Flow instance is not ready
+      return { x: 250, y: 250 };
+    }
+    
+    const viewport = reactFlowInstance.getViewport();
+    // Get the canvas dimensions (excluding sidebar which is 320px)
+    const canvasWidth = window.innerWidth - 320; // 320px is sidebar width
+    const canvasHeight = window.innerHeight;
+    
+    // Calculate center in screen coordinates
+    const centerX = canvasWidth / 2;
+    const centerY = canvasHeight / 2;
+    
+    // Convert screen coordinates to flow coordinates using viewport transform
+    // Formula: flowX = (screenX - viewport.x) / viewport.zoom
+    const flowX = (centerX - viewport.x) / viewport.zoom;
+    const flowY = (centerY - viewport.y) / viewport.zoom;
+    
+    return { x: flowX, y: flowY };
+  }, [reactFlowInstance]);
 
   // Handle double-click to add new task
   const handlePaneDoubleClick = useCallback(
@@ -101,7 +129,7 @@ const Canvas = () => {
     <div className="flex h-screen w-full">
       {/* Main Canvas */}
       <div className="flex-1 relative">
-        <Toolbar />
+        <Toolbar getViewportCenter={getViewportCenter} />
         <ReactFlow
           nodes={nodesWithSelection}
           edges={edges}

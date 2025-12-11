@@ -1,7 +1,12 @@
+import { ReactFlowProvider } from '@xyflow/react';
 import Canvas from './components/Canvas';
 
 function App() {
-  return <Canvas />;
+  return (
+    <ReactFlowProvider>
+      <Canvas />
+    </ReactFlowProvider>
+  );
 }
 
 export default App
