@@ -188,6 +188,10 @@ const Canvas = () => {
           deleteKeyCode={['Backspace', 'Delete']}
           snapToGrid
           snapGrid={[15, 15]}
+          panOnScroll
+          panOnScrollMode="free"
+          zoomOnScroll={false}
+          zoomOnPinch
         >
           <Background
             variant={BackgroundVariant.Dots}
