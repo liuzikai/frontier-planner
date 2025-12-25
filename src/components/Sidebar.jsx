@@ -13,6 +13,7 @@ const Sidebar = () => {
 
   const selectedNodeData = nodes.find((node) => node.id === selectedNode);
   const debounceTimerRef = useRef(null);
+  const pendingChangesRef = useRef(null);
 
   useEffect(() => {
     if (selectedNodeData) {
@@ -30,6 +31,9 @@ const Sidebar = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     
+    // Store pending changes
+    pendingChangesRef.current = { [name]: value };
+    
     // Debounce the updateTask call so rapid typing only creates one history entry
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
@@ -38,18 +42,24 @@ const Sidebar = () => {
     if (selectedNode) {
       debounceTimerRef.current = setTimeout(() => {
         updateTask(selectedNode, { [name]: value });
+        pendingChangesRef.current = null;
       }, 500); // Wait 500ms after last keystroke before saving to history
     }
   }, [selectedNode, updateTask]);
 
-  // Cleanup debounce timer on unmount or when node changes
+  // Flush pending changes before node changes or unmount
   useEffect(() => {
     return () => {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
+      // If there are pending changes, apply them immediately
+      if (pendingChangesRef.current && selectedNode) {
+        updateTask(selectedNode, pendingChangesRef.current);
+        pendingChangesRef.current = null;
+      }
     };
-  }, [selectedNode]);
+  }, [selectedNode, updateTask]);
 
   const handleClose = () => {
     setSelectedNode(null);
