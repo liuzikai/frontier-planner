@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   ReactFlow,
   Controls,
@@ -45,6 +45,9 @@ const Canvas = () => {
   
   // Get React Flow instance to access viewport
   const reactFlowInstance = useReactFlow();
+
+  // MiniMap visibility state
+  const [showMiniMap, setShowMiniMap] = useState(true);
 
   // Sync our selectedNode with React Flow's selection state
   const nodesWithSelection = nodes.map((node) => ({
@@ -146,7 +149,7 @@ const Canvas = () => {
     <div className="flex h-screen w-full">
       {/* Main Canvas */}
       <div className="flex-1 relative">
-        <Toolbar getViewportCenter={getViewportCenter} />
+        <Toolbar getViewportCenter={getViewportCenter} showMiniMap={showMiniMap} setShowMiniMap={setShowMiniMap} />
         <ReactFlow
           nodes={nodesWithSelection}
           edges={edgesWithStyle}
@@ -175,37 +178,27 @@ const Canvas = () => {
             color="#e5e7eb"
           />
           <Controls className="!bg-white !rounded-lg !shadow-lg !border !border-gray-200" />
-          <MiniMap
-            nodeColor={(node) => {
-              switch (node.data?.status) {
-                case 'done':
-                  return '#22c55e';
-                case 'in-progress':
-                  return '#3b82f6';
-                default:
-                  return '#9ca3af';
-              }
-            }}
-            maskColor="rgba(0, 0, 0, 0.1)"
-            className="!bg-white !rounded-lg !shadow-lg !border !border-gray-200"
-          />
+          {showMiniMap && (
+            <MiniMap
+              nodeColor={(node) => {
+                switch (node.data?.status) {
+                  case 'done':
+                    return '#22c55e';
+                  case 'in-progress':
+                    return '#3b82f6';
+                  default:
+                    return '#9ca3af';
+                }
+              }}
+              maskColor="rgba(0, 0, 0, 0.1)"
+              className="!bg-white !rounded-lg !shadow-lg !border !border-gray-200 animate-in fade-in slide-in-from-right-5 duration-300"
+            />
+          )}
         </ReactFlow>
-
-        {/* Instructions overlay */}
-        <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 px-4 py-3 text-sm text-gray-600 max-w-xs">
-          <p className="font-medium text-gray-800 mb-1">Quick Tips:</p>
-          <ul className="space-y-1 text-xs">
-            <li>• <strong>Double-click</strong> canvas to add task</li>
-            <li>• <strong>Drag</strong> tasks to reposition</li>
-            <li>• <strong>Connect</strong> handles to create dependencies</li>
-            <li>• <strong>Click</strong> task to edit details</li>
-            <li>• <strong>Ctrl/⌘+Z</strong> undo, <strong>Ctrl/⌘+Shift+Z</strong> redo</li>
-          </ul>
-        </div>
       </div>
 
-      {/* Sidebar */}
-      <Sidebar />
+      {/* Sidebar - only show when a node is selected */}
+      {selectedNode && <Sidebar />}
     </div>
   );
 };
