@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useStore } from '../store/useStore';
 
-const Sidebar = () => {
+const Sidebar = ({ onMinimize }) => {
   const { nodes, selectedNode, updateTask, setSelectedNode, tags } = useStore();
   const [formData, setFormData] = useState({
     title: '',
@@ -17,20 +17,7 @@ const Sidebar = () => {
   const debounceTimerRef = useRef(null);
   const pendingChangesRef = useRef(null);
 
-  useEffect(() => {
-    if (selectedNodeData) {
-      setFormData({
-        title: selectedNodeData.data.title || '',
-        description: selectedNodeData.data.description || '',
-        status: selectedNodeData.data.status || 'todo',
-        primaryTag: selectedNodeData.data.primaryTag || null,
-        estimatedTime: selectedNodeData.data.estimatedTime || '',
-        estimatedTimeUnit: selectedNodeData.data.estimatedTimeUnit || 'days',
-        note: selectedNodeData.data.note || '',
-      });
-    }
-  }, [selectedNodeData]);
-
+  // All hooks must be called before any conditional returns
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -51,6 +38,46 @@ const Sidebar = () => {
     }
   }, [selectedNode, updateTask]);
 
+  const handleStatusChange = useCallback((status) => {
+    setFormData((prev) => ({ ...prev, status }));
+    if (selectedNode) {
+      updateTask(selectedNode, { status });
+    }
+  }, [selectedNode, updateTask]);
+
+  const handleTagChange = useCallback((e) => {
+    const tagId = e.target.value || null;
+    setFormData((prev) => ({ ...prev, primaryTag: tagId }));
+    if (selectedNode) {
+      updateTask(selectedNode, { primaryTag: tagId });
+    }
+  }, [selectedNode, updateTask]);
+
+  const handleTimeUnitChange = useCallback((unit) => {
+    setFormData((prev) => ({ ...prev, estimatedTimeUnit: unit }));
+    if (selectedNode) {
+      updateTask(selectedNode, { estimatedTimeUnit: unit });
+    }
+  }, [selectedNode, updateTask]);
+
+  const handleClose = useCallback(() => {
+    setSelectedNode(null);
+  }, [setSelectedNode]);
+
+  useEffect(() => {
+    if (selectedNodeData) {
+      setFormData({
+        title: selectedNodeData.data.title || '',
+        description: selectedNodeData.data.description || '',
+        status: selectedNodeData.data.status || 'todo',
+        primaryTag: selectedNodeData.data.primaryTag || null,
+        estimatedTime: selectedNodeData.data.estimatedTime || '',
+        estimatedTimeUnit: selectedNodeData.data.estimatedTimeUnit || 'days',
+        note: selectedNodeData.data.note || '',
+      });
+    }
+  }, [selectedNodeData]);
+
   // Flush pending changes before node changes or unmount
   useEffect(() => {
     return () => {
@@ -65,10 +92,118 @@ const Sidebar = () => {
     };
   }, [selectedNode, updateTask]);
 
-  const handleClose = () => {
-    setSelectedNode(null);
-  };
+  // Show welcome panel if no node is selected
+  if (!selectedNode) {
+    return (
+      <div className="w-80 h-screen bg-white border-l border-gray-200 shadow-lg flex flex-col">
+        {/* Header with minimize button */}
+        <div className="px-4 py-3 border-b border-gray-200 flex justify-between items-center">
+          <h2 className="font-semibold text-gray-800">Task Dependency Graph</h2>
+          <button
+            onClick={onMinimize}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+            title="Close panel"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
+        
+        {/* Welcome content */}
+        <div className="flex-1 p-4 overflow-y-auto">
+          <div className="space-y-6">
+            {/* Getting Started */}
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-2">Getting Started</h3>
+              <ul className="space-y-1.5 text-sm text-gray-600">
+                <li>• Double-click canvas to add task</li>
+                <li>• Select node to edit and show <strong>task frontier</strong></li>
+                <li>• Drag to reposition</li>
+                <li>• Connect green and blue handles for dependencies</li>
+                <li>• Cmd/Ctrl+Click for multi-select</li>
+                <li>• Ctrl/⌘+Z undo, Ctrl/⌘+Shift+Z redo</li>
+              </ul>
+            </div>
+            
+            {/* Features */}
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-2">Features</h3>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li className="flex items-start gap-2">
+                  <span className="text-orange-500 font-bold mt-0.5">◉</span>
+                  <span><strong>Frontier Nodes:</strong> Orange rings show next actionable tasks (all dependencies complete)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-orange-500 font-bold mt-0.5">⏱</span>
+                  <span><strong>Time Estimation:</strong> Σ (sum) and ↓ (min) show time to reach selected task</span>
+                </li>
+              </ul>
+            </div>
+            
+            {/* Stats */}
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-2">Stats</h3>
+              <div className="space-y-2 text-sm text-gray-600">
+                {/* All nodes */}
+                <div className="flex justify-between">
+                  <span>All nodes</span>
+                  <span className="font-medium">{nodes.length}</span>
+                </div>
+                
+                {/* Spacer */}
+                <div className="h-1"></div>
+                
+                {/* By status */}
+                <div className="flex justify-between">
+                  <span>Done</span>
+                  <span className="font-medium">{nodes.filter(n => n.data.status === 'done').length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>In Progress</span>
+                  <span className="font-medium">{nodes.filter(n => n.data.status === 'in-progress').length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>To Do</span>
+                  <span className="font-medium">{nodes.filter(n => n.data.status === 'todo').length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Someday</span>
+                  <span className="font-medium">{nodes.filter(n => n.data.status === 'someday').length}</span>
+                </div>
+                
+                {/* By tags */}
+                {tags.filter(tag => nodes.some(n => n.data.primaryTag === tag.id)).length > 0 && (
+                  <>
+                    {/* Spacer */}
+                    <div className="h-1"></div>
+                    
+                    {tags
+                      .map(tag => ({
+                        tag,
+                        count: nodes.filter(n => n.data.primaryTag === tag.id).length,
+                      }))
+                      .filter(item => item.count > 0)
+                      .map(({ tag, count }) => (
+                        <div key={tag.id} className="flex justify-between items-center">
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: tag.color }}></div>
+                            <span>{tag.name}</span>
+                          </div>
+                          <span className="font-medium">{count}</span>
+                        </div>
+                      ))}
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
+  // Show task details if node is selected and data exists
   if (!selectedNode || !selectedNodeData) {
     return (
       <div className="w-80 bg-white border-l border-gray-200 p-6 flex flex-col items-center justify-center text-gray-400">
@@ -88,6 +223,7 @@ const Sidebar = () => {
         <button
           onClick={handleClose}
           className="text-gray-400 hover:text-gray-600 transition-colors"
+          title="Close (deselect)"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -142,10 +278,7 @@ const Sidebar = () => {
               <button
                 key={status.value}
                 type="button"
-                onClick={() => {
-                  const event = { target: { name: 'status', value: status.value } };
-                  handleChange(event);
-                }}
+                onClick={() => handleStatusChange(status.value)}
                 className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
                   formData.status === status.value
                     ? 'bg-blue-500 text-white border-blue-500'
@@ -166,7 +299,7 @@ const Sidebar = () => {
           <select
             name="primaryTag"
             value={formData.primaryTag || ''}
-            onChange={handleChange}
+            onChange={handleTagChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg%20xmlns%3d%22http%3a%2f%2fwww.w3.org%2f2000%2fsvg%22%20viewBox%3d%220%200%2020%2020%22%20fill%3d%22none%22%3e%3cpath%20d%3d%22M7%207l3-3%203%203m0%206l-3%203-3-3%22%20stroke%3d%22%239ca3af%22%20stroke-width%3d%221.5%22%20stroke-linecap%3d%22round%22%20stroke-linejoin%3d%22round%22%2f%3e%3c%2fsvg%3e')] bg-[length:1.5em] bg-[right_0.5rem_center] bg-no-repeat pr-10"
             style={{ WebkitAppearance: 'none', MozAppearance: 'none' }}
           >
@@ -203,10 +336,7 @@ const Sidebar = () => {
                 <button
                   key={unit}
                   type="button"
-                  onClick={() => {
-                    const event = { target: { name: 'estimatedTimeUnit', value: unit } };
-                    handleChange(event);
-                  }}
+                  onClick={() => handleTimeUnitChange(unit)}
                   className={`px-3 py-2 text-sm transition-colors ${
                     formData.estimatedTimeUnit === unit
                       ? 'bg-blue-500 text-white'

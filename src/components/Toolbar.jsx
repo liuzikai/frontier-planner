@@ -133,21 +133,6 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
       {/* Divider */}
       <div className="w-px h-8 bg-gray-300" />
 
-      {/* Toggle MiniMap Button */}
-      <button
-        onClick={() => setShowMiniMap(!showMiniMap)}
-        className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors shadow-lg border border-gray-200 ${
-          showMiniMap
-            ? 'bg-blue-50 text-blue-700 border-blue-300'
-            : 'bg-white text-gray-700 hover:bg-gray-100'
-        }`}
-        title={showMiniMap ? 'Hide minimap' : 'Show minimap'}
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293zM17.707 5.293L14 1.586v12.828l2.293 2.293A1 1 0 0018 16V6a1 1 0 00-.293-.707z" clipRule="evenodd" />
-        </svg>
-      </button>
-
       {/* Manage Tags Button */}
       <button
         onClick={() => setShowTagManager(true)}
@@ -181,78 +166,8 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
         </svg>
       </button>
 
-      {/* Task Count with Stats Hover */}
-      <div className="relative group">
-        <div className="px-3 py-2 bg-white rounded-lg shadow-lg border border-gray-200 text-sm text-gray-600 cursor-default">
-          {nodes.length} task{nodes.length !== 1 ? 's' : ''}
-        </div>
-        {/* Stats Popup */}
-        <div className="absolute top-full left-0 mt-2 w-56 bg-white/95 backdrop-blur-sm rounded-lg shadow-xl border border-gray-200 p-3
-                        opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                        transition-all duration-200 ease-out
-                        transform translate-y-[-8px] group-hover:translate-y-0 z-50">
-          <p className="font-medium text-gray-800 mb-2 text-sm">Status Breakdown:</p>
-          <div className="space-y-1 text-xs">
-            <div className="flex justify-between text-gray-600">
-              <span>✓ Done</span>
-              <span className="font-medium">{stats.done}</span>
-            </div>
-            <div className="flex justify-between text-gray-600">
-              <span>→ In Progress</span>
-              <span className="font-medium">{stats.inProgress}</span>
-            </div>
-            <div className="flex justify-between text-gray-600">
-              <span>○ To Do</span>
-              <span className="font-medium">{stats.todo}</span>
-            </div>
-            <div className="flex justify-between text-gray-600">
-              <span>◇ Someday</span>
-              <span className="font-medium">{stats.someday}</span>
-            </div>
-          </div>
-          {stats.byTag.length > 0 && (
-            <>
-              <div className="border-t border-gray-200 my-2"></div>
-              <p className="font-medium text-gray-800 mb-2 text-sm">By Tag:</p>
-              <div className="space-y-1 text-xs">
-                {stats.byTag.map(({ tag, count }) => (
-                  <div key={tag.id} className="flex justify-between items-center text-gray-600">
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: tag.color }}></div>
-                      <span>{tag.name}</span>
-                    </div>
-                    <span className="font-medium">{count}</span>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Tips Button with Hover */}
-      <div className="relative group">
-        <button className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-100 transition-colors shadow-lg border border-gray-200">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-          </svg>
-        </button>
-        {/* Tips Popup */}
-        <div className="absolute top-full left-0 mt-2 w-72 bg-white/95 backdrop-blur-sm rounded-lg shadow-xl border border-gray-200 p-4 
-                        opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                        transition-all duration-200 ease-out
-                        transform translate-y-[-8px] group-hover:translate-y-0 z-50">
-          <p className="font-medium text-gray-800 mb-2 text-sm">Quick Tips:</p>
-          <ul className="space-y-1.5 text-xs text-gray-600">
-            <li>• <strong>Double-click</strong> canvas to add task</li>
-            <li>• <strong>Drag</strong> tasks to reposition</li>
-            <li>• <strong>Connect</strong> handles to create dependencies</li>
-            <li>• <strong>Click</strong> task to edit details</li>
-            <li>• <strong>Select</strong> a task to see frontier nodes (orange ring) and time to reach it</li>
-            <li>• <strong>Ctrl/⌘+Z</strong> undo, <strong>Ctrl/⌘+Shift+Z</strong> redo</li>
-          </ul>
-        </div>
-      </div>
+      {/* Divider */}
+      <div className="w-px h-8 bg-gray-300" />
 
       {/* Current File Name */}
       {currentFileName && (

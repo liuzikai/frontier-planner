@@ -222,6 +222,7 @@ export const useStore = create(
         nodes: initialNodes,
         edges: initialEdges,
         selectedNode: null,
+        selectedNodes: [], // Array of selected node IDs for multi-select
         currentFileName: null,
         tags: defaultTags,
 
@@ -324,7 +325,22 @@ export const useStore = create(
           // Selection changes should not be part of undo history
           const { pause, resume } = useStore.temporal.getState();
           pause();
-          set({ selectedNode: nodeId });
+          set({ 
+            selectedNode: nodeId,
+            selectedNodes: nodeId ? [nodeId] : [],
+          });
+          resume();
+        },
+
+        setSelectedNodes: (nodeIds) => {
+          // Update both selectedNodes array and selectedNode for backward compatibility
+          // selectedNode is set to the first node if exactly one is selected, otherwise null
+          const { pause, resume } = useStore.temporal.getState();
+          pause();
+          set({ 
+            selectedNodes: nodeIds,
+            selectedNode: nodeIds.length === 1 ? nodeIds[0] : null,
+          });
           resume();
         },
 
@@ -411,6 +427,7 @@ export const useStore = create(
             nodes: [],
             edges: [],
             selectedNode: null,
+            selectedNodes: [],
           });
         },
 
@@ -421,6 +438,7 @@ export const useStore = create(
             edges: initialEdges,
             tags: defaultTags,
             selectedNode: null,
+            selectedNodes: [],
           });
         },
 

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, useMemo } from 'react';
 import {
   ReactFlow,
   Controls,
+  ControlButton,
   MiniMap,
   Background,
   BackgroundVariant,
@@ -33,11 +34,13 @@ const Canvas = () => {
     nodes,
     edges,
     selectedNode,
+    selectedNodes,
     onNodesChange,
     onEdgesChange,
     onConnect,
     addTask,
     setSelectedNode,
+    setSelectedNodes,
     onNodeDragStart,
     onNodeDragStop,
   } = useStore();
@@ -50,21 +53,40 @@ const Canvas = () => {
 
   // MiniMap visibility state
   const [showMiniMap, setShowMiniMap] = useState(true);
+  
+  // Sidebar minimize state (persists until a node is selected)
+  const [sidebarMinimized, setSidebarMinimized] = useState(false);
+  
+  // Reset minimize state when a node is selected
+  useEffect(() => {
+    if (selectedNode) {
+      setSidebarMinimized(false);
+    }
+  }, [selectedNode]);
 
-  // Calculate frontier tasks when a node is selected
+  // Calculate frontier tasks only when exactly one node is selected
+  // Disabled for multi-select to maintain focus on single-target analysis
   const frontierTasks = useMemo(() => {
+    if (selectedNodes.length !== 1) {
+      return new Set(); // Return empty set for multi-select
+    }
     return findFrontierTasks(selectedNode, nodes, edges);
-  }, [selectedNode, nodes, edges]);
+  }, [selectedNode, selectedNodes, nodes, edges]);
 
-  // Calculate cumulative times for the dependency path
+  // Calculate cumulative times only when exactly one node is selected
+  // Disabled for multi-select to maintain focus on single-target analysis
   const cumulativeTimes = useMemo(() => {
+    if (selectedNodes.length !== 1) {
+      return new Map(); // Return empty map for multi-select
+    }
     return calculateCumulativeTimes(selectedNode, frontierTasks, nodes, edges);
-  }, [selectedNode, frontierTasks, nodes, edges]);
+  }, [selectedNode, selectedNodes, frontierTasks, nodes, edges]);
 
-  // Sync our selectedNode with React Flow's selection state and add frontier info
+  // Sync our selectedNodes with React Flow's selection state and add frontier info
+  // Frontier and time info only shown when single node selected
   const nodesWithSelection = nodes.map((node) => ({
     ...node,
-    selected: node.id === selectedNode,
+    selected: selectedNodes.includes(node.id),
     data: {
       ...node.data,
       isFrontier: frontierTasks.has(node.id),
@@ -150,17 +172,42 @@ const Canvas = () => {
     [addTask]
   );
 
-  // Handle click on empty canvas to deselect
+  // Handle click on empty canvas to deselect all
   const handlePaneClick = useCallback(() => {
-    setSelectedNode(null);
-  }, [setSelectedNode]);
+    setSelectedNodes([]);
+  }, [setSelectedNodes]);
 
   // Handle node click to select
+  // Support Cmd+Click (Mac) or Ctrl+Click (Windows) for multi-select
   const handleNodeClick = useCallback(
     (event, node) => {
-      setSelectedNode(node.id);
+      const isMultiSelectKey = event.metaKey || event.ctrlKey;
+      
+      if (isMultiSelectKey) {
+        // Add/remove from selection
+        if (selectedNodes.includes(node.id)) {
+          // Deselect if already selected
+          const newSelection = selectedNodes.filter(id => id !== node.id);
+          setSelectedNodes(newSelection);
+        } else {
+          // Add to selection
+          setSelectedNodes([...selectedNodes, node.id]);
+        }
+      } else {
+        // Single select (replace selection)
+        setSelectedNode(node.id);
+      }
     },
-    [setSelectedNode]
+    [setSelectedNode, setSelectedNodes, selectedNodes]
+  );
+
+  // Handle selection change from React Flow (for box select and multi-select)
+  const handleSelectionChange = useCallback(
+    ({ nodes: selectedNodesFromFlow }) => {
+      const selectedIds = selectedNodesFromFlow.map((n) => n.id);
+      setSelectedNodes(selectedIds);
+    },
+    [setSelectedNodes]
   );
 
   return (
@@ -176,6 +223,7 @@ const Canvas = () => {
           onConnect={onConnect}
           onPaneClick={handlePaneClick}
           onNodeClick={handleNodeClick}
+          onSelectionChange={handleSelectionChange}
           onDoubleClick={handlePaneDoubleClick}
           onNodeDragStart={onNodeDragStart}
           onNodeDragStop={onNodeDragStop}
@@ -199,7 +247,17 @@ const Canvas = () => {
             size={1}
             color="#e5e7eb"
           />
-          <Controls className="!bg-white !rounded-lg !shadow-lg !border !border-gray-200" />
+          <Controls className="!bg-white !rounded-lg !shadow-lg !border !border-gray-200">
+            <ControlButton
+              onClick={() => setShowMiniMap(!showMiniMap)}
+              title={showMiniMap ? 'Hide minimap' : 'Show minimap'}
+              className={showMiniMap ? '!bg-blue-50 !text-blue-700' : ''}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293zM17.707 5.293L14 1.586v12.828l2.293 2.293A1 1 0 0018 16V6a1 1 0 00-.293-.707z" clipRule="evenodd" />
+              </svg>
+            </ControlButton>
+          </Controls>
           {showMiniMap && (
             <MiniMap
               nodeColor={(node) => {
@@ -213,14 +271,17 @@ const Canvas = () => {
                 }
               }}
               maskColor="rgba(0, 0, 0, 0.1)"
-              className="!bg-white !rounded-lg !shadow-lg !border !border-gray-200 animate-in fade-in slide-in-from-right-5 duration-300"
+              className="!bg-white !rounded-lg !shadow-lg !border !border-gray-200 !left-10 animate-in fade-in slide-in-from-left-5 duration-300"
+              position="bottom-left"
             />
           )}
         </ReactFlow>
       </div>
 
-      {/* Sidebar - only show when a node is selected */}
-      {selectedNode && <Sidebar />}
+      {/* Sidebar - show by default unless minimized or multi-select */}
+      {!sidebarMinimized && selectedNodes.length <= 1 && (
+        <Sidebar onMinimize={() => setSidebarMinimized(true)} />
+      )}
     </div>
   );
 };

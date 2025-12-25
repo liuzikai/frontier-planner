@@ -19,14 +19,8 @@ const statusLabels = {
 };
 
 const TaskNode = ({ id, data, selected }) => {
-  const setSelectedNode = useStore((state) => state.setSelectedNode);
   const deleteTask = useStore((state) => state.deleteTask);
   const tags = useStore((state) => state.tags);
-
-  const handleClick = (e) => {
-    e.stopPropagation();
-    setSelectedNode(id);
-  };
 
   const handleDelete = (e) => {
     e.stopPropagation();
@@ -42,7 +36,6 @@ const TaskNode = ({ id, data, selected }) => {
   return (
     <div className={`relative group ${nodeOpacity}`}>
       <div
-        onClick={handleClick}
         className={`
           min-w-[200px] max-w-[280px] rounded-lg shadow-lg border-2 transition-all duration-200
           ${statusColors[data.status]}
@@ -127,8 +120,8 @@ const TaskNode = ({ id, data, selected }) => {
         {data.cumulativeTime && (
           <Tooltip
             content={data.cumulativeTime.sum === data.cumulativeTime.min 
-              ? "Time to reach this task from frontier nodes" 
-              : "Σ = Sum (serial execution)\n↓ = Min (parallel execution)\n\nSum: Total time if all tasks done one after another\nMin: Minimum time with maximum parallelism"
+              ? "Time to reach this task from frontier nodes\n\n1 week = 5 days\n1 month = 4 weeks" 
+              : "Σ = Sum (serial execution), total time if all tasks are done one after another\n↓ = Min (parallel execution), minimum time with maximum parallelism\n\n1 week = 5 days\n1 month = 4 weeks"
             }
             className={`absolute right-0 ${
               data.cumulativeTime.sum === data.cumulativeTime.min ? '-top-8' : '-top-12'
