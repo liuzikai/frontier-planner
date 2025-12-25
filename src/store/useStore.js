@@ -10,10 +10,10 @@ const generateTagId = () => `tag-${Date.now()}-${Math.random().toString(36).subs
 
 // Default tags
 const defaultTags = [
-  { id: 'tag-frontend', name: 'Frontend', color: '#3b82f6' }, // blue
-  { id: 'tag-backend', name: 'Backend', color: '#10b981' }, // green
-  { id: 'tag-design', name: 'Design', color: '#8b5cf6' }, // purple
-  { id: 'tag-research', name: 'Research', color: '#f59e0b' }, // amber
+  { id: 'tag-1734000001-eng', name: 'Engineering', color: '#3b82f6' }, // blue
+  { id: 'tag-1734000002-prd', name: 'Product', color: '#8b5cf6' }, // purple
+  { id: 'tag-1734000003-inf', name: 'Infrastructure', color: '#10b981' }, // green
+  { id: 'tag-1734000004-mkt', name: 'Marketing', color: '#f59e0b' }, // amber
 ];
 
 // Default task data
@@ -44,8 +44,8 @@ const initialNodes = [
       title: 'Research Phase',
       description: 'Gather requirements and research solutions',
       status: 'done',
-      primaryTag: 'tag-research',
-      tags: ['tag-research'],
+      primaryTag: 'tag-1734000002-prd',
+      tags: ['tag-1734000002-prd'],
       estimatedTime: 3,
       estimatedTimeUnit: 'days',
       note: 'Completed initial research',
@@ -60,8 +60,8 @@ const initialNodes = [
       title: 'Design Wireframes',
       description: 'Create initial wireframes',
       status: 'done',
-      primaryTag: 'tag-design',
-      tags: ['tag-design'],
+      primaryTag: 'tag-1734000002-prd',
+      tags: ['tag-1734000002-prd'],
       estimatedTime: 5,
       estimatedTimeUnit: 'days',
       note: 'Wireframes approved',
@@ -76,8 +76,8 @@ const initialNodes = [
       title: 'Setup Infrastructure',
       description: 'Configure servers and databases',
       status: 'done',
-      primaryTag: 'tag-backend',
-      tags: ['tag-backend'],
+      primaryTag: 'tag-1734000003-inf',
+      tags: ['tag-1734000003-inf'],
       estimatedTime: 2,
       estimatedTimeUnit: 'days',
       note: 'All infrastructure ready',
@@ -92,8 +92,8 @@ const initialNodes = [
       title: 'Design Components',
       description: 'Build reusable UI components',
       status: 'in-progress',
-      primaryTag: 'tag-design',
-      tags: ['tag-design', 'tag-frontend'],
+      primaryTag: 'tag-1734000001-eng',
+      tags: ['tag-1734000001-eng', 'tag-1734000002-prd'],
       estimatedTime: 2,
       estimatedTimeUnit: 'weeks',
       note: 'Creating component library',
@@ -108,8 +108,8 @@ const initialNodes = [
       title: 'API Development',
       description: 'Build backend REST APIs',
       status: 'todo',
-      primaryTag: 'tag-backend',
-      tags: ['tag-backend'],
+      primaryTag: 'tag-1734000001-eng',
+      tags: ['tag-1734000001-eng'],
       estimatedTime: 3,
       estimatedTimeUnit: 'weeks',
       note: 'Waiting to start',
@@ -124,8 +124,8 @@ const initialNodes = [
       title: 'Frontend Integration',
       description: 'Connect UI to backend APIs',
       status: 'todo',
-      primaryTag: 'tag-frontend',
-      tags: ['tag-frontend'],
+      primaryTag: 'tag-1734000001-eng',
+      tags: ['tag-1734000001-eng'],
       estimatedTime: 1.5,
       estimatedTimeUnit: 'weeks',
       note: 'Needs APIs and components',
@@ -140,8 +140,8 @@ const initialNodes = [
       title: 'Testing & QA',
       description: 'Comprehensive testing',
       status: 'todo',
-      primaryTag: 'tag-design',
-      tags: ['tag-design'],
+      primaryTag: 'tag-1734000002-prd',
+      tags: ['tag-1734000002-prd', 'tag-1734000001-eng'],
       estimatedTime: 1,
       estimatedTimeUnit: 'weeks',
       note: 'End-to-end testing',
@@ -156,8 +156,8 @@ const initialNodes = [
       title: 'Documentation',
       description: 'Write user guides',
       status: 'someday',
-      primaryTag: 'tag-research',
-      tags: ['tag-research'],
+      primaryTag: 'tag-1734000002-prd',
+      tags: ['tag-1734000002-prd'],
       estimatedTime: 5,
       estimatedTimeUnit: 'days',
       note: 'Low priority',
@@ -172,8 +172,8 @@ const initialNodes = [
       title: 'Marketing Materials',
       description: 'Create promotional content',
       status: 'todo',
-      primaryTag: 'tag-design',
-      tags: ['tag-design'],
+      primaryTag: 'tag-1734000004-mkt',
+      tags: ['tag-1734000004-mkt'],
       estimatedTime: null,
       estimatedTimeUnit: 'days',
       note: 'Needs time estimate',
@@ -188,8 +188,8 @@ const initialNodes = [
       title: 'Production Launch',
       description: 'Deploy to production',
       status: 'todo',
-      primaryTag: 'tag-backend',
-      tags: ['tag-backend', 'tag-frontend'],
+      primaryTag: 'tag-1734000003-inf',
+      tags: ['tag-1734000003-inf', 'tag-1734000001-eng'],
       estimatedTime: 3,
       estimatedTimeUnit: 'days',
       note: 'Final milestone',
@@ -419,6 +419,7 @@ export const useStore = create(
           set({
             nodes: initialNodes,
             edges: initialEdges,
+            tags: defaultTags,
             selectedNode: null,
           });
         },
