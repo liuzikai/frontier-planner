@@ -2,12 +2,12 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useStore } from '../store/useStore';
 
 const Sidebar = () => {
-  const { nodes, selectedNode, updateTask, setSelectedNode } = useStore();
+  const { nodes, selectedNode, updateTask, setSelectedNode, tags } = useStore();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     status: 'todo',
-    priority: 'medium',
+    primaryTag: null,
     dueDate: '',
   });
 
@@ -20,7 +20,7 @@ const Sidebar = () => {
         title: selectedNodeData.data.title || '',
         description: selectedNodeData.data.description || '',
         status: selectedNodeData.data.status || 'todo',
-        priority: selectedNodeData.data.priority || 'medium',
+        primaryTag: selectedNodeData.data.primaryTag || null,
         dueDate: selectedNodeData.data.dueDate || '',
       });
     }
@@ -127,23 +127,27 @@ const Sidebar = () => {
             <option value="todo">To Do</option>
             <option value="in-progress">In Progress</option>
             <option value="done">Done</option>
+            <option value="someday">Someday/Maybe</option>
           </select>
         </div>
 
-        {/* Priority */}
+        {/* Primary Tag */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Priority
+            Primary Tag
           </label>
           <select
-            name="priority"
-            value={formData.priority}
+            name="primaryTag"
+            value={formData.primaryTag || ''}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
           >
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
+            <option value="">No Tag</option>
+            {tags.map((tag) => (
+              <option key={tag.id} value={tag.id}>
+                {tag.name}
+              </option>
+            ))}
           </select>
         </div>
 

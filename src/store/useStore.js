@@ -6,6 +6,15 @@ import { applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
 
 // Generate unique IDs
 const generateId = () => `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+const generateTagId = () => `tag-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+// Default tags
+const defaultTags = [
+  { id: 'tag-frontend', name: 'Frontend', color: '#3b82f6' }, // blue
+  { id: 'tag-backend', name: 'Backend', color: '#10b981' }, // green
+  { id: 'tag-design', name: 'Design', color: '#8b5cf6' }, // purple
+  { id: 'tag-research', name: 'Research', color: '#f59e0b' }, // amber
+];
 
 // Default task data
 const createDefaultTask = (position = { x: 100, y: 100 }) => ({
@@ -15,8 +24,9 @@ const createDefaultTask = (position = { x: 100, y: 100 }) => ({
   data: {
     title: 'New Task',
     description: '',
-    status: 'todo', // todo, in-progress, done
-    priority: 'medium', // low, medium, high
+    status: 'todo', // todo, in-progress, done, someday
+    primaryTag: null, // tag id
+    tags: [], // array of tag ids
     dueDate: null,
     createdAt: new Date().toISOString(),
   },
@@ -32,7 +42,8 @@ const initialNodes = [
       title: 'Research Phase',
       description: 'Gather requirements and research solutions',
       status: 'done',
-      priority: 'high',
+      primaryTag: 'tag-research',
+      tags: ['tag-research'],
       dueDate: null,
       createdAt: new Date().toISOString(),
     },
@@ -45,7 +56,8 @@ const initialNodes = [
       title: 'Design System',
       description: 'Create wireframes and design mockups',
       status: 'in-progress',
-      priority: 'high',
+      primaryTag: 'tag-design',
+      tags: ['tag-design', 'tag-frontend'],
       dueDate: null,
       createdAt: new Date().toISOString(),
     },
@@ -58,7 +70,8 @@ const initialNodes = [
       title: 'Setup Development Environment',
       description: 'Configure tools and dependencies',
       status: 'done',
-      priority: 'medium',
+      primaryTag: 'tag-backend',
+      tags: ['tag-backend'],
       dueDate: null,
       createdAt: new Date().toISOString(),
     },
@@ -71,7 +84,8 @@ const initialNodes = [
       title: 'Implementation',
       description: 'Build the core features',
       status: 'todo',
-      priority: 'high',
+      primaryTag: 'tag-frontend',
+      tags: ['tag-frontend', 'tag-backend'],
       dueDate: null,
       createdAt: new Date().toISOString(),
     },
@@ -94,6 +108,7 @@ export const useStore = create(
         edges: initialEdges,
         selectedNode: null,
         currentFileName: null,
+        tags: defaultTags,
 
         // Node actions
         // Filter out internal React Flow changes from history tracking
@@ -198,6 +213,42 @@ export const useStore = create(
           resume();
         },
 
+        // Tag management
+        addTag: (name, color) => {
+          const newTag = {
+            id: generateTagId(),
+            name,
+            color,
+          };
+          set({
+            tags: [...get().tags, newTag],
+          });
+          return newTag;
+        },
+
+        updateTag: (tagId, updates) => {
+          set({
+            tags: get().tags.map((tag) =>
+              tag.id === tagId ? { ...tag, ...updates } : tag
+            ),
+          });
+        },
+
+        deleteTag: (tagId) => {
+          // Remove tag and clear it from all nodes
+          set({
+            tags: get().tags.filter((tag) => tag.id !== tagId),
+            nodes: get().nodes.map((node) => ({
+              ...node,
+              data: {
+                ...node.data,
+                primaryTag: node.data.primaryTag === tagId ? null : node.data.primaryTag,
+                tags: node.data.tags.filter((id) => id !== tagId),
+              },
+            })),
+          });
+        },
+
         // Store node positions before drag starts
         _preDragNodes: null,
         
@@ -259,12 +310,13 @@ export const useStore = create(
 
         // Export graph to JSON
         exportToJSON: () => {
-          const { nodes, edges } = get();
+          const { nodes, edges, tags } = get();
           const data = {
             version: '1.0',
             exportedAt: new Date().toISOString(),
             nodes,
             edges,
+            tags,
           };
           return JSON.stringify(data, null, 2);
         },
@@ -279,6 +331,7 @@ export const useStore = create(
             set({
               nodes: data.nodes,
               edges: data.edges,
+              tags: data.tags || defaultTags, // Use default tags if not in file
               selectedNode: null,
             });
             return { success: true };
@@ -346,6 +399,8 @@ export const useStore = create(
       partialize: (state) => ({
         nodes: state.nodes,
         edges: state.edges,
+        tags: state.tags,
+        currentFileName: state.currentFileName,
       }),
     }
   )

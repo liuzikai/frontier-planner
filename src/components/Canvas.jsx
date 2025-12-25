@@ -52,6 +52,23 @@ const Canvas = () => {
     selected: node.id === selectedNode,
   }));
 
+  // Style edges based on source node status
+  const edgesWithStyle = edges.map((edge) => {
+    const sourceNode = nodes.find((n) => n.id === edge.source);
+    const isDone = sourceNode?.data?.status === 'done';
+    
+    return {
+      ...edge,
+      animated: !isDone,
+      style: {
+        strokeWidth: 2,
+        stroke: isDone ? '#9ca3af' : '#6366f1',
+        opacity: isDone ? 0.4 : 1,
+        strokeDasharray: isDone ? '5,5' : undefined,
+      },
+    };
+  });
+
   // Keyboard shortcuts for undo/redo
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -132,7 +149,7 @@ const Canvas = () => {
         <Toolbar getViewportCenter={getViewportCenter} />
         <ReactFlow
           nodes={nodesWithSelection}
-          edges={edges}
+          edges={edgesWithStyle}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
