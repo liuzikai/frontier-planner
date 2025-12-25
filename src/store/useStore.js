@@ -28,6 +28,7 @@ const createDefaultTask = (position = { x: 100, y: 100 }) => ({
     primaryTag: null, // tag id
     tags: [], // array of tag ids
     dueDate: null,
+    note: '',
     createdAt: new Date().toISOString(),
   },
 });
@@ -45,6 +46,7 @@ const initialNodes = [
       primaryTag: 'tag-research',
       tags: ['tag-research'],
       dueDate: null,
+      note: '',
       createdAt: new Date().toISOString(),
     },
   },
@@ -59,6 +61,7 @@ const initialNodes = [
       primaryTag: 'tag-design',
       tags: ['tag-design', 'tag-frontend'],
       dueDate: null,
+      note: '',
       createdAt: new Date().toISOString(),
     },
   },
@@ -73,6 +76,7 @@ const initialNodes = [
       primaryTag: 'tag-backend',
       tags: ['tag-backend'],
       dueDate: null,
+      note: '',
       createdAt: new Date().toISOString(),
     },
   },
@@ -87,6 +91,7 @@ const initialNodes = [
       primaryTag: 'tag-frontend',
       tags: ['tag-frontend', 'tag-backend'],
       dueDate: null,
+      note: '',
       createdAt: new Date().toISOString(),
     },
   },

@@ -9,6 +9,7 @@ const Sidebar = () => {
     status: 'todo',
     primaryTag: null,
     dueDate: '',
+    note: '',
   });
 
   const selectedNodeData = nodes.find((node) => node.id === selectedNode);
@@ -23,6 +24,7 @@ const Sidebar = () => {
         status: selectedNodeData.data.status || 'todo',
         primaryTag: selectedNodeData.data.primaryTag || null,
         dueDate: selectedNodeData.data.dueDate || '',
+        note: selectedNodeData.data.note || '',
       });
     }
   }, [selectedNodeData]);
@@ -172,6 +174,21 @@ const Sidebar = () => {
             value={formData.dueDate}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+          />
+        </div>
+
+        {/* Note */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Note
+          </label>
+          <textarea
+            name="note"
+            value={formData.note}
+            onChange={handleChange}
+            rows={4}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
+            placeholder="Add private notes..."
           />
         </div>
 
