@@ -12,6 +12,7 @@ import TaskNode from './TaskNode';
 import Toolbar from './Toolbar';
 import Sidebar from './Sidebar';
 import { findFrontierTasks } from '../utils/frontierUtils';
+import { calculateCumulativeTimes } from '../utils/timeUtils';
 
 // Define custom node types
 const nodeTypes = {
@@ -55,6 +56,11 @@ const Canvas = () => {
     return findFrontierTasks(selectedNode, nodes, edges);
   }, [selectedNode, nodes, edges]);
 
+  // Calculate cumulative times for the dependency path
+  const cumulativeTimes = useMemo(() => {
+    return calculateCumulativeTimes(selectedNode, frontierTasks, nodes, edges);
+  }, [selectedNode, frontierTasks, nodes, edges]);
+
   // Sync our selectedNode with React Flow's selection state and add frontier info
   const nodesWithSelection = nodes.map((node) => ({
     ...node,
@@ -62,6 +68,7 @@ const Canvas = () => {
     data: {
       ...node.data,
       isFrontier: frontierTasks.has(node.id),
+      cumulativeTime: cumulativeTimes.get(node.id),
     },
   }));
 
@@ -69,15 +76,16 @@ const Canvas = () => {
   const edgesWithStyle = edges.map((edge) => {
     const sourceNode = nodes.find((n) => n.id === edge.source);
     const isDone = sourceNode?.data?.status === 'done';
+    const isSomeday = sourceNode?.data?.status === 'someday';
     
     return {
       ...edge,
-      animated: !isDone,
+      animated: !isDone && !isSomeday,
       style: {
         strokeWidth: 2,
-        stroke: isDone ? '#9ca3af' : '#6366f1',
-        opacity: isDone ? 0.4 : 1,
-        strokeDasharray: isDone ? '5,5' : undefined,
+        stroke: (isDone || isSomeday) ? '#9ca3af' : '#6366f1',
+        opacity: (isDone || isSomeday) ? 0.4 : 1,
+        strokeDasharray: (isDone || isSomeday) ? '5,5' : undefined,
       },
     };
   });

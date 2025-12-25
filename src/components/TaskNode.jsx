@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { useStore } from '../store/useStore';
+import { formatTime } from '../utils/timeUtils';
 
 const statusColors = {
   'todo': 'bg-gray-100 border-gray-300 text-gray-700',
@@ -47,6 +48,7 @@ const TaskNode = ({ id, data, selected }) => {
           ${selected ? 'ring-2 ring-blue-500 ring-offset-2 scale-105' : 'hover:shadow-xl'}
           ${data.isFrontier ? 'ring-4 ring-orange-500 ring-offset-2 shadow-orange-500/50' : ''}
         `}
+        title={data.isFrontier ? "Frontier node: Next actionable task (all dependencies complete, not done/someday)" : ""}
       >
         {/* Input Handle (left side) */}
         <Handle
@@ -119,6 +121,46 @@ const TaskNode = ({ id, data, selected }) => {
           position={Position.Right}
           className="!w-3 !h-3 !bg-green-500 !border-2 !border-white"
         />
+        
+        {/* Cumulative Time Display - on top of node, right side */}
+        {data.cumulativeTime && (
+          <div 
+            className={`absolute right-0 bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded shadow-lg pointer-events-auto cursor-help ${
+              data.cumulativeTime.sum === data.cumulativeTime.min ? '-top-8' : '-top-12'
+            }`}
+            title={data.cumulativeTime.sum === data.cumulativeTime.min 
+              ? "Time to reach this task from frontier nodes" 
+              : "Σ = Sum (serial execution)\n↓ = Min (parallel execution)\n\nSum: Total time if all tasks done one after another\nMin: Minimum time with maximum parallelism"
+            }
+          >
+            {data.cumulativeTime.sum === data.cumulativeTime.min ? (
+              // Single time (frontier or equal)
+              <div>{formatTime(data.cumulativeTime.sum)}</div>
+            ) : (
+              // Two times (sum and min)
+              <div className="text-left leading-tight">
+                <div className="flex items-center gap-1">
+                  <span className="opacity-70">Σ</span>
+                  <span>{formatTime(data.cumulativeTime.sum)}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="opacity-70">↓</span>
+                  <span>{formatTime(data.cumulativeTime.min)}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        
+        {/* Frontier node with no estimated time - show "?" */}
+        {data.isFrontier && !data.estimatedTime && (
+          <div 
+            className="absolute -top-8 right-0 bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded shadow-lg pointer-events-auto cursor-help"
+            title="Frontier node: Ready to start (all dependencies complete) but missing estimated time"
+          >
+            ?
+          </div>
+        )}
       </div>
     </div>
   );

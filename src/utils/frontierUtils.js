@@ -68,10 +68,10 @@ const isTaskExecutable = (taskId, edges, nodes) => {
   // Find all dependencies (incoming edges) of this task
   const dependencies = edges.filter(edge => edge.target === taskId);
   
-  // Check if all dependency tasks are completed
+  // Check if all dependency tasks are completed or someday (not blocking)
   return dependencies.every(edge => {
     const dependencyNode = nodes.find(node => node.id === edge.source);
-    return dependencyNode && dependencyNode.data.status === 'done';
+    return dependencyNode && (dependencyNode.data.status === 'done' || dependencyNode.data.status === 'someday');
   });
 };
 
@@ -102,9 +102,9 @@ export const findFrontierTasks = (selectedTaskId, nodes, edges) => {
     if (!ancestorNode) return;
     
     // Check if this ancestor is a frontier task:
-    // 1. Not completed
+    // 1. Not completed or someday
     // 2. All its dependencies are completed (executable)
-    if (ancestorNode.data.status !== 'done' && isTaskExecutable(ancestorId, edges, nodes)) {
+    if (ancestorNode.data.status !== 'done' && ancestorNode.data.status !== 'someday' && isTaskExecutable(ancestorId, edges, nodes)) {
       frontierTasks.add(ancestorId);
     }
   });

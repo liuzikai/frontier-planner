@@ -248,6 +248,7 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
             <li>• <strong>Drag</strong> tasks to reposition</li>
             <li>• <strong>Connect</strong> handles to create dependencies</li>
             <li>• <strong>Click</strong> task to edit details</li>
+            <li>• <strong>Select</strong> a task to see frontier nodes (orange ring) and time to reach it</li>
             <li>• <strong>Ctrl/⌘+Z</strong> undo, <strong>Ctrl/⌘+Shift+Z</strong> redo</li>
           </ul>
         </div>
