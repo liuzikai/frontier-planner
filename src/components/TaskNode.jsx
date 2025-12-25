@@ -42,7 +42,6 @@ const TaskNode = ({ id, data, selected }) => {
           ${selected ? 'ring-2 ring-blue-500 ring-offset-2 scale-105' : 'hover:shadow-xl'}
           ${data.isFrontier ? 'ring-4 ring-orange-500 ring-offset-2 shadow-orange-500/50' : ''}
         `}
-        title={data.isFrontier ? "Frontier node: Next actionable task (all dependencies complete, not done/someday)" : ""}
       >
         {/* Input Handle (left side) */}
         <Handle
@@ -123,7 +122,7 @@ const TaskNode = ({ id, data, selected }) => {
               ? "Time to reach this task from frontier nodes\n\n1 week = 5 days\n1 month = 4 weeks" 
               : "Σ = Sum (serial execution), total time if all tasks are done one after another\n↓ = Min (parallel execution), minimum time with maximum parallelism\n\n1 week = 5 days\n1 month = 4 weeks"
             }
-            className={`absolute right-0 ${
+            className={`absolute right-0 z-50 ${
               data.cumulativeTime.sum === data.cumulativeTime.min ? '-top-8' : '-top-12'
             }`}
           >
@@ -152,7 +151,7 @@ const TaskNode = ({ id, data, selected }) => {
         {data.isFrontier && !data.estimatedTime && (
           <Tooltip
             content="Frontier node: Ready to start (all dependencies complete) but missing estimated time"
-            className="absolute -top-8 right-0"
+            className="absolute -top-8 right-0 z-50"
           >
             <div className="bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded shadow-lg cursor-help">
               ?

@@ -1,23 +1,46 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 const Tooltip = ({ content, children, className = '' }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const triggerRef = useRef(null);
+
+  useEffect(() => {
+    if (isVisible && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setPosition({
+        top: rect.top - 8, // 8px offset above the element
+        left: rect.left + rect.width / 2,
+      });
+    }
+  }, [isVisible]);
 
   return (
     <div 
+      ref={triggerRef}
       className={className}
       onMouseEnter={() => setIsVisible(true)}
       onMouseLeave={() => setIsVisible(false)}
     >
       {children}
-      {isVisible && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg whitespace-pre-line z-50 pointer-events-none w-max max-w-xs">
+      {isVisible && createPortal(
+        <div 
+          className="fixed px-3 py-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg whitespace-pre-line pointer-events-none w-max max-w-xs"
+          style={{
+            top: `${position.top}px`,
+            left: `${position.left}px`,
+            transform: 'translate(-50%, -100%)',
+            zIndex: 9999,
+          }}
+        >
           {content}
           {/* Arrow */}
           <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px]">
             <div className="border-4 border-transparent border-t-gray-900"></div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

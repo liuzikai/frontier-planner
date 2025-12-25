@@ -272,6 +272,7 @@ const Canvas = () => {
               }}
               maskColor="rgba(0, 0, 0, 0.1)"
               className="!bg-white !rounded-lg !shadow-lg !border !border-gray-200 !left-10 animate-in fade-in slide-in-from-left-5 duration-300"
+              style={{ width: 180, height: 130 }}
               position="bottom-left"
             />
           )}
