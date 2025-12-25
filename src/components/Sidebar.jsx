@@ -8,7 +8,8 @@ const Sidebar = () => {
     description: '',
     status: 'todo',
     primaryTag: null,
-    dueDate: '',
+    estimatedTime: '',
+    estimatedTimeUnit: 'days',
     note: '',
   });
 
@@ -23,7 +24,8 @@ const Sidebar = () => {
         description: selectedNodeData.data.description || '',
         status: selectedNodeData.data.status || 'todo',
         primaryTag: selectedNodeData.data.primaryTag || null,
-        dueDate: selectedNodeData.data.dueDate || '',
+        estimatedTime: selectedNodeData.data.estimatedTime || '',
+        estimatedTimeUnit: selectedNodeData.data.estimatedTimeUnit || 'days',
         note: selectedNodeData.data.note || '',
       });
     }
@@ -130,17 +132,30 @@ const Sidebar = () => {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Status
           </label>
-          <select
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
-          >
-            <option value="todo">To Do</option>
-            <option value="in-progress">In Progress</option>
-            <option value="done">Done</option>
-            <option value="someday">Someday/Maybe</option>
-          </select>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { value: 'todo', label: 'To Do' },
+              { value: 'in-progress', label: 'In Progress' },
+              { value: 'done', label: 'Done' },
+              { value: 'someday', label: 'Someday' },
+            ].map((status) => (
+              <button
+                key={status.value}
+                type="button"
+                onClick={() => {
+                  const event = { target: { name: 'status', value: status.value } };
+                  handleChange(event);
+                }}
+                className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
+                  formData.status === status.value
+                    ? 'bg-blue-500 text-white border-blue-500'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                {status.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Primary Tag */}
@@ -152,7 +167,8 @@ const Sidebar = () => {
             name="primaryTag"
             value={formData.primaryTag || ''}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg%20xmlns%3d%22http%3a%2f%2fwww.w3.org%2f2000%2fsvg%22%20viewBox%3d%220%200%2020%2020%22%20fill%3d%22none%22%3e%3cpath%20d%3d%22M7%207l3-3%203%203m0%206l-3%203-3-3%22%20stroke%3d%22%239ca3af%22%20stroke-width%3d%221.5%22%20stroke-linecap%3d%22round%22%20stroke-linejoin%3d%22round%22%2f%3e%3c%2fsvg%3e')] bg-[length:1.5em] bg-[right_0.5rem_center] bg-no-repeat pr-10"
+            style={{ WebkitAppearance: 'none', MozAppearance: 'none' }}
           >
             <option value="">No Tag</option>
             {tags.map((tag) => (
@@ -163,18 +179,45 @@ const Sidebar = () => {
           </select>
         </div>
 
-        {/* Due Date */}
+        {/* Estimated Time */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Due Date
+            Estimated Time
           </label>
-          <input
-            type="date"
-            name="dueDate"
-            value={formData.dueDate}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-          />
+          <div className="flex gap-2">
+            {/* Number Input */}
+            <input
+              type="number"
+              name="estimatedTime"
+              value={formData.estimatedTime}
+              onChange={handleChange}
+              step="0.5"
+              min="0"
+              className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              placeholder="0"
+            />
+            
+            {/* Unit Selection */}
+            <div className="flex flex-1 border border-gray-300 rounded-lg overflow-hidden">
+              {['days', 'weeks', 'months'].map((unit) => (
+                <button
+                  key={unit}
+                  type="button"
+                  onClick={() => {
+                    const event = { target: { name: 'estimatedTimeUnit', value: unit } };
+                    handleChange(event);
+                  }}
+                  className={`px-3 py-2 text-sm transition-colors ${
+                    formData.estimatedTimeUnit === unit
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                  } ${unit !== 'days' ? 'border-l border-gray-300' : ''}`}
+                >
+                  {unit}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Note */}
@@ -190,15 +233,6 @@ const Sidebar = () => {
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
             placeholder="Add private notes..."
           />
-        </div>
-
-        {/* Dependencies Info */}
-        <div className="pt-4 border-t border-gray-200">
-          <h3 className="text-sm font-medium text-gray-700 mb-2">Connections</h3>
-          <p className="text-xs text-gray-500">
-            Drag from the <span className="text-green-600 font-medium">green handle</span> on the right to create dependencies.
-            Connect to the <span className="text-blue-600 font-medium">blue handle</span> on the left of another task.
-          </p>
         </div>
       </div>
 

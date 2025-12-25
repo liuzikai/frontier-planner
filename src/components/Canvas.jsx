@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import {
   ReactFlow,
   Controls,
@@ -11,6 +11,7 @@ import { useStore, useTemporalStore } from '../store/useStore';
 import TaskNode from './TaskNode';
 import Toolbar from './Toolbar';
 import Sidebar from './Sidebar';
+import { findFrontierTasks } from '../utils/frontierUtils';
 
 // Define custom node types
 const nodeTypes = {
@@ -49,10 +50,19 @@ const Canvas = () => {
   // MiniMap visibility state
   const [showMiniMap, setShowMiniMap] = useState(true);
 
-  // Sync our selectedNode with React Flow's selection state
+  // Calculate frontier tasks when a node is selected
+  const frontierTasks = useMemo(() => {
+    return findFrontierTasks(selectedNode, nodes, edges);
+  }, [selectedNode, nodes, edges]);
+
+  // Sync our selectedNode with React Flow's selection state and add frontier info
   const nodesWithSelection = nodes.map((node) => ({
     ...node,
     selected: node.id === selectedNode,
+    data: {
+      ...node.data,
+      isFrontier: frontierTasks.has(node.id),
+    },
   }));
 
   // Style edges based on source node status
