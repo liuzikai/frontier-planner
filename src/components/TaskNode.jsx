@@ -82,7 +82,7 @@ const TaskNode = ({ id, data, selected }) => {
               </span>
               {data.estimatedTime && (
                 <span className="inline-block text-[10px] px-1.5 py-0.5 rounded font-medium bg-gray-100 text-gray-600">
-                  ⏱ {data.estimatedTime} {data.estimatedTimeUnit || 'days'}
+                  ⏱ {data.estimatedTime} {parseFloat(data.estimatedTime) === 1 ? (data.estimatedTimeUnit || 'days').replace(/s$/, '') : (data.estimatedTimeUnit || 'days')}
                 </span>
               )}
             </div>

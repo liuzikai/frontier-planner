@@ -49,7 +49,7 @@ export const convertToDays = (value, unit) => {
 /**
  * Format days to best unit (largest unit with non-zero integer part)
  * @param {number} days - Time in days
- * @returns {string} Formatted string like "2.5w" or "1.2m"
+ * @returns {string} Formatted string like "2.5 weeks" or "1.2 months"
  */
 export const formatTime = (days) => {
   const numDays = parseFloat(days);
@@ -58,17 +58,20 @@ export const formatTime = (days) => {
   // Try months (20 days)
   if (numDays >= 20) {
     const months = numDays / 20;
-    return `${months.toFixed(1)}m`;
+    const value = months.toFixed(1).replace(/\.0$/, '');
+    return `${value} ${parseFloat(value) === 1 ? 'month' : 'months'}`;
   }
   
   // Try weeks (5 days)
   if (numDays >= 5) {
     const weeks = numDays / 5;
-    return `${weeks.toFixed(1)}w`;
+    const value = weeks.toFixed(1).replace(/\.0$/, '');
+    return `${value} ${parseFloat(value) === 1 ? 'week' : 'weeks'}`;
   }
   
   // Use days
-  return `${numDays.toFixed(1)}d`;
+  const value = numDays.toFixed(1).replace(/\.0$/, '');
+  return `${value} ${parseFloat(value) === 1 ? 'day' : 'days'}`;
 };
 
 /**
