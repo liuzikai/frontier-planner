@@ -39,7 +39,7 @@ const TaskNode = ({ id, data, selected }) => {
         className={`
           min-w-[200px] max-w-[280px] rounded-lg shadow-lg border-2 transition-all duration-200
           ${statusColors[data.status]}
-          ${selected ? 'ring-2 ring-blue-500 ring-offset-2 scale-105' : 'hover:shadow-xl'}
+          ${selected ? 'ring-2 ring-purple-500 ring-offset-2 scale-105' : 'hover:shadow-xl'}
           ${data.isFrontier ? 'ring-4 ring-orange-500 ring-offset-2 shadow-orange-500/50' : ''}
         `}
       >

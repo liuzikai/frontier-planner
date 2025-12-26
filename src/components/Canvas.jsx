@@ -64,14 +64,19 @@ const Canvas = () => {
     }
   }, [selectedNode]);
 
-  // Calculate frontier tasks only when exactly one node is selected
-  // Disabled for multi-select to maintain focus on single-target analysis
+  // Calculate frontier tasks for all selected nodes
   const frontierTasks = useMemo(() => {
-    if (selectedNodes.length !== 1) {
-      return new Set(); // Return empty set for multi-select
+    if (selectedNodes.length === 0) {
+      return new Set();
     }
-    return findFrontierTasks(selectedNode, nodes, edges);
-  }, [selectedNode, selectedNodes, nodes, edges]);
+    
+    const allFrontiers = new Set();
+    selectedNodes.forEach(nodeId => {
+      const frontiers = findFrontierTasks(nodeId, nodes, edges);
+      frontiers.forEach(id => allFrontiers.add(id));
+    });
+    return allFrontiers;
+  }, [selectedNodes, nodes, edges]);
 
   // Calculate cumulative times only when exactly one node is selected
   // Disabled for multi-select to maintain focus on single-target analysis
@@ -83,7 +88,7 @@ const Canvas = () => {
   }, [selectedNode, selectedNodes, frontierTasks, nodes, edges]);
 
   // Sync our selectedNodes with React Flow's selection state and add frontier info
-  // Frontier and time info only shown when single node selected
+  // Frontier info shown for all selected nodes; time info only for single selection
   const nodesWithSelection = nodes.map((node) => ({
     ...node,
     selected: selectedNodes.includes(node.id),
@@ -264,6 +269,8 @@ const Canvas = () => {
           {showMiniMap && (
             <MiniMap
               nodeColor={(node) => {
+                if (node.selected) return '#8b5cf6'; // purple-500
+                if (node.data?.isFrontier) return '#f97316'; // orange-500
                 switch (node.data?.status) {
                   case 'done':
                     return '#22c55e';
@@ -273,6 +280,12 @@ const Canvas = () => {
                     return '#9ca3af';
                 }
               }}
+              nodeStrokeColor={(node) => {
+                if (node.selected) return '#7c3aed'; // purple-700
+                if (node.data?.isFrontier) return '#c2410c'; // orange-700
+                return 'transparent';
+              }}
+              nodeStrokeWidth={(node) => (node.selected || node.data?.isFrontier ? 4 : 0)}
               maskColor="rgba(0, 0, 0, 0.1)"
               className="!bg-white !rounded-lg !shadow-lg !border !border-gray-200 !left-10 animate-in fade-in slide-in-from-left-5 duration-300"
               style={{ width: 180, height: 130 }}
