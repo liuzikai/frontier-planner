@@ -169,7 +169,7 @@ const Canvas = () => {
       style: {
         strokeWidth: isSelected ? 3 : 2,
         stroke: isSelected 
-          ? (darkMode ? '#60a5fa' : '#2563eb') 
+          ? (darkMode ? '#c084fc' : '#a855f7') 
           : ((isDone || isSomeday) ? '#9ca3af' : '#6366f1'),
         opacity: isSelected ? 1 : ((isDone || isSomeday) ? 0.4 : 1),
         strokeDasharray: (isDone || isSomeday) && !isSelected ? '5,5' : undefined,
@@ -244,14 +244,10 @@ const Canvas = () => {
     setSelectedNodes([]);
   }, [setSelectedNodes]);
 
-  // Confirm before deleting nodes
-  const onBeforeDelete = useCallback(async ({ nodes: nodesToDelete }) => {
-    if (nodesToDelete.length > 0) {
-      const nodeNames = nodesToDelete.map(n => n.data.title || 'Untitled Task').join(', ');
-      return window.confirm(`Are you sure you want to delete ${nodesToDelete.length === 1 ? 'this task' : 'these tasks'} (${nodeNames})?`);
-    }
-    return true;
-  }, []);
+  // Handle edge click to deselect nodes
+  const handleEdgeClick = useCallback(() => {
+    setSelectedNodes([]);
+  }, [setSelectedNodes]);
 
   // Handle node click to select
   // Support Cmd+Click (Mac) or Ctrl+Click (Windows) for multi-select
@@ -298,12 +294,12 @@ const Canvas = () => {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onPaneClick={handlePaneClick}
+          onEdgeClick={handleEdgeClick}
           onNodeClick={handleNodeClick}
           onSelectionChange={handleSelectionChange}
           onDoubleClick={handlePaneDoubleClick}
           onNodeDragStart={onNodeDragStart}
           onNodeDragStop={onNodeDragStop}
-          onBeforeDelete={onBeforeDelete}
           nodeTypes={nodeTypes}
           defaultEdgeOptions={defaultEdgeOptions}
           elevateNodesOnSelect={true}
