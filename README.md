@@ -1,8 +1,11 @@
 # Frontier Planner
 
+[![Live Demo](https://img.shields.io/badge/demo-online-blue.svg)](https://liuzikai.github.io/frontier-planner/)
 ![Frontier Planner Screenshot](screenshot.jpg)
 
-A visual task management tool built with React and React Flow that helps you organize tasks with dependencies, track progress, and estimate time to completion.
+**Frontier Planner** is a visual task management tool built with React and React Flow. It helps you organize complex projects by visualizing task dependencies, identifying "frontier" (next actionable) tasks, and calculating project timelines with support for parallel execution.
+
+[**Try the Live Demo →**](https://liuzikai.github.io/frontier-planner/)
 
 ## Features
 
