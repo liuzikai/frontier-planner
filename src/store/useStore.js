@@ -4,19 +4,18 @@ import { temporal } from 'zundo';
 import { useStore as useZustandStore } from 'zustand';
 import { applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
 
-// Generate unique IDs
+// --- Utilities ---
+
 const generateId = () => `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 const generateTagId = () => `tag-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-// Default tags
 const defaultTags = [
-  { id: 'tag-1734000001-eng', name: 'Engineering', color: '#3b82f6' }, // blue
-  { id: 'tag-1734000002-prd', name: 'Product', color: '#8b5cf6' }, // purple
-  { id: 'tag-1734000003-inf', name: 'Infrastructure', color: '#10b981' }, // green
-  { id: 'tag-1734000004-mkt', name: 'Marketing', color: '#f59e0b' }, // amber
+  { id: 'tag-1734000001-eng', name: 'Engineering', color: '#3b82f6' },
+  { id: 'tag-1734000002-prd', name: 'Product', color: '#8b5cf6' },
+  { id: 'tag-1734000003-inf', name: 'Infrastructure', color: '#10b981' },
+  { id: 'tag-1734000004-mkt', name: 'Marketing', color: '#f59e0b' },
 ];
 
-// Default task data
 const createDefaultTask = (position = { x: 100, y: 100 }) => ({
   id: generateId(),
   type: 'taskNode',
@@ -24,17 +23,18 @@ const createDefaultTask = (position = { x: 100, y: 100 }) => ({
   data: {
     title: 'New Task',
     description: '',
-    status: 'todo', // todo, in-progress, done, someday
-    primaryTag: null, // tag id
-    tags: [], // array of tag ids
+    status: 'todo',
+    primaryTag: null,
+    tags: [],
     estimatedTime: null,
-    estimatedTimeUnit: 'days', // days, weeks, months
+    estimatedTimeUnit: 'days',
     note: '',
     createdAt: new Date().toISOString(),
   },
 });
 
-// Initial demo data
+// --- Demo Data ---
+
 const initialNodes = [
   {
     id: 'task-1',
@@ -116,103 +116,49 @@ const initialNodes = [
       createdAt: new Date().toISOString(),
     },
   },
-  {
-    id: 'task-6',
-    type: 'taskNode',
-    position: { x: 1150, y: 150 },
-    data: {
-      title: 'Frontend Integration',
-      description: 'Connect UI to backend APIs',
-      status: 'todo',
-      primaryTag: 'tag-1734000001-eng',
-      tags: ['tag-1734000001-eng'],
-      estimatedTime: 1.5,
-      estimatedTimeUnit: 'weeks',
-      note: 'Needs APIs and components',
-      createdAt: new Date().toISOString(),
-    },
-  },
-  {
-    id: 'task-7',
-    type: 'taskNode',
-    position: { x: 1500, y: 150 },
-    data: {
-      title: 'Testing & QA',
-      description: 'Comprehensive testing',
-      status: 'todo',
-      primaryTag: 'tag-1734000002-prd',
-      tags: ['tag-1734000002-prd', 'tag-1734000001-eng'],
-      estimatedTime: 1,
-      estimatedTimeUnit: 'weeks',
-      note: 'End-to-end testing',
-      createdAt: new Date().toISOString(),
-    },
-  },
-  {
-    id: 'task-8',
-    type: 'taskNode',
-    position: { x: 100, y: 450 },
-    data: {
-      title: 'Documentation',
-      description: 'Write user guides',
-      status: 'someday',
-      primaryTag: 'tag-1734000002-prd',
-      tags: ['tag-1734000002-prd'],
-      estimatedTime: 5,
-      estimatedTimeUnit: 'days',
-      note: 'Low priority',
-      createdAt: new Date().toISOString(),
-    },
-  },
-  {
-    id: 'task-9',
-    type: 'taskNode',
-    position: { x: 450, y: 450 },
-    data: {
-      title: 'Marketing Materials',
-      description: 'Create promotional content',
-      status: 'todo',
-      primaryTag: 'tag-1734000004-mkt',
-      tags: ['tag-1734000004-mkt'],
-      estimatedTime: null,
-      estimatedTimeUnit: 'days',
-      note: 'Needs time estimate',
-      createdAt: new Date().toISOString(),
-    },
-  },
-  {
-    id: 'task-10',
-    type: 'taskNode',
-    position: { x: 1850, y: 150 },
-    data: {
-      title: 'Production Launch',
-      description: 'Deploy to production',
-      status: 'todo',
-      primaryTag: 'tag-1734000003-inf',
-      tags: ['tag-1734000003-inf', 'tag-1734000001-eng'],
-      estimatedTime: 3,
-      estimatedTimeUnit: 'days',
-      note: 'Final milestone',
-      createdAt: new Date().toISOString(),
-    },
-  },
 ];
 
 const initialEdges = [
-  // Main development chain
   { id: 'e1-2', source: 'task-1', target: 'task-2', animated: true },
   { id: 'e1-3', source: 'task-1', target: 'task-3', animated: true },
   { id: 'e2-4', source: 'task-2', target: 'task-4', animated: true },
   { id: 'e3-5', source: 'task-3', target: 'task-5', animated: true },
-  { id: 'e4-6', source: 'task-4', target: 'task-6', animated: true },
-  { id: 'e5-6', source: 'task-5', target: 'task-6', animated: true },
-  { id: 'e6-7', source: 'task-6', target: 'task-7', animated: true },
-  { id: 'e7-10', source: 'task-7', target: 'task-10', animated: true },
-  
-  // Someday branch (non-blocking)
-  { id: 'e8-9', source: 'task-8', target: 'task-9', animated: true },
-  { id: 'e9-10', source: 'task-9', target: 'task-10', animated: true },
 ];
+
+// --- File System Access API Helpers ---
+
+const getFileHandle = async () => {
+  try {
+    const [handle] = await window.showOpenFilePicker({
+      types: [{ description: 'JSON Files', accept: { 'application/json': ['.json'] } }],
+      multiple: false,
+    });
+    return handle;
+  } catch (err) {
+    if (err.name === 'AbortError') return null;
+    throw err;
+  }
+};
+
+const getNewFileHandle = async (suggestedName = 'project.json') => {
+  try {
+    return await window.showSaveFilePicker({
+      suggestedName,
+      types: [{ description: 'JSON Files', accept: { 'application/json': ['.json'] } }],
+    });
+  } catch (err) {
+    if (err.name === 'AbortError') return null;
+    throw err;
+  }
+};
+
+const writeFile = async (fileHandle, contents) => {
+  const writable = await fileHandle.createWritable();
+  await writable.write(contents);
+  await writable.close();
+};
+
+// --- Store Implementation ---
 
 export const useStore = create(
   persist(
@@ -221,217 +167,179 @@ export const useStore = create(
         // State
         nodes: initialNodes,
         edges: initialEdges,
-        selectedNode: null,
-        selectedNodes: [], // Array of selected node IDs for multi-select
-        currentFileName: null,
         tags: defaultTags,
+        selectedNode: null,
+        selectedNodes: [],
+        currentFileName: null,
+        fileHandle: null, // Not persisted
+        isDirty: false,
+        lastSavedAt: null,
+        snapshots: [], // Persisted versions
+        isNativeFileSystemSupported: 'showSaveFilePicker' in window && window.isSecureContext,
+        _preDragNodes: null,
 
-        // Node actions
-        // Filter out internal React Flow changes from history tracking
-        // - dimensions: sent when nodes are rendered
-        // - position: sent during dragging (handled by onNodeDragStart/Stop)
-        // - select: sent when nodes are selected (handled by setSelectedNode)
+        // ... existing actions ...
+        createSnapshot: (name) => {
+          const { nodes, edges, tags } = get();
+          const snapshot = {
+            id: `snap-${Date.now()}`,
+            name: name || `Snapshot ${new Date().toLocaleString()}`,
+            timestamp: new Date().toISOString(),
+            data: JSON.parse(JSON.stringify({ nodes, edges, tags })),
+          };
+          set({ snapshots: [snapshot, ...get().snapshots] });
+        },
+
+        deleteSnapshot: (id) => {
+          set({ snapshots: get().snapshots.filter(s => s.id !== id) });
+        },
+
+        restoreSnapshot: (id) => {
+          const snapshot = get().snapshots.find(s => s.id === id);
+          if (!snapshot) return;
+          set({
+            nodes: snapshot.data.nodes,
+            edges: snapshot.data.edges,
+            tags: snapshot.data.tags || get().tags,
+            isDirty: true,
+          });
+        },
         onNodesChange: (changes) => {
-          // Check if these are only internal changes that shouldn't create history
-          const isOnlyInternalChanges = changes.every(
-            (change) => change.type === 'dimensions' || change.type === 'position' || change.type === 'select'
+          const isOnlyInternal = changes.every(
+            (c) => c.type === 'dimensions' || c.type === 'position' || c.type === 'select'
           );
           
-          if (isOnlyInternalChanges) {
-            // For these changes, pause/resume around the set to avoid history
-            // Unless we're already paused (e.g., during drag)
-            const isCurrentlyTracking = useStore.temporal.getState().isTracking;
-            
-            if (isCurrentlyTracking) {
-              const { pause, resume } = useStore.temporal.getState();
-              pause();
-              set({
-                nodes: applyNodeChanges(changes, get().nodes),
-              });
-              resume();
+          if (isOnlyInternal) {
+            const isTracking = useStore.temporal.getState().isTracking;
+            if (isTracking) {
+              useStore.temporal.getState().pause();
+              set({ nodes: applyNodeChanges(changes, get().nodes) });
+              useStore.temporal.getState().resume();
             } else {
-              // Already paused (during drag), just set without touching pause/resume
-              set({
-                nodes: applyNodeChanges(changes, get().nodes),
-              });
+              set({ nodes: applyNodeChanges(changes, get().nodes) });
             }
           } else {
-            // Real changes (add, remove, etc.) - these should create history
-            set({
-              nodes: applyNodeChanges(changes, get().nodes),
-            });
+            set({ nodes: applyNodeChanges(changes, get().nodes), isDirty: true });
           }
         },
 
         onEdgesChange: (changes) => {
-          set({
-            edges: applyEdgeChanges(changes, get().edges),
-          });
+          set({ edges: applyEdgeChanges(changes, get().edges), isDirty: true });
         },
 
         onConnect: (connection) => {
           const newEdge = {
             ...connection,
-            id: `e${connection.source}-${connection.target}`,
+            id: `edge-${Date.now()}`,
             animated: true,
+            style: { strokeWidth: 2, stroke: '#6366f1' },
           };
-          set({
-            edges: [...get().edges, newEdge],
-          });
+          set({ edges: [...get().edges, newEdge], isDirty: true });
         },
 
         addTask: (position) => {
-          const newTask = createDefaultTask(position);
-          // First set nodes (this creates history)
-          set({
-            nodes: [...get().nodes, newTask],
-          });
-          // Then set selection without creating history
-          const { pause, resume } = useStore.temporal.getState();
-          pause();
-          set({ selectedNode: newTask.id });
-          resume();
-          return newTask;
+          const newNode = createDefaultTask(position);
+          set({ nodes: [...get().nodes, newNode], isDirty: true });
+          
+          // Selection doesn't go to history
+          useStore.temporal.getState().pause();
+          set({ selectedNode: newNode.id, selectedNodes: [newNode.id] });
+          useStore.temporal.getState().resume();
+          return newNode;
         },
 
-        updateTask: (nodeId, data) => {
+        updateTask: (id, data) => {
           set({
-            nodes: get().nodes.map((node) =>
-              node.id === nodeId
-                ? { ...node, data: { ...node.data, ...data } }
-                : node
+            nodes: get().nodes.map((n) =>
+              n.id === id ? { ...n, data: { ...n.data, ...data } } : n
             ),
+            isDirty: true,
           });
         },
 
-        deleteTask: (nodeId) => {
-          // Delete node and edges (this creates history)
+        deleteTask: (id) => {
           set({
-            nodes: get().nodes.filter((node) => node.id !== nodeId),
-            edges: get().edges.filter(
-              (edge) => edge.source !== nodeId && edge.target !== nodeId
-            ),
+            nodes: get().nodes.filter((n) => n.id !== id),
+            edges: get().edges.filter((e) => e.source !== id && e.target !== id),
+            isDirty: true,
           });
-          // Update selection without creating history
-          if (get().selectedNode === nodeId) {
-            const { pause, resume } = useStore.temporal.getState();
-            pause();
-            set({ selectedNode: null });
-            resume();
+          
+          if (get().selectedNode === id || get().selectedNodes.includes(id)) {
+            useStore.temporal.getState().pause();
+            set({ 
+              selectedNode: get().selectedNode === id ? null : get().selectedNode,
+              selectedNodes: get().selectedNodes.filter(nid => nid !== id)
+            });
+            useStore.temporal.getState().resume();
           }
         },
 
-        setSelectedNode: (nodeId) => {
-          // Selection changes should not be part of undo history
-          const { pause, resume } = useStore.temporal.getState();
-          pause();
-          set({ 
-            selectedNode: nodeId,
-            selectedNodes: nodeId ? [nodeId] : [],
-          });
-          resume();
-        },
-
-        setSelectedNodes: (nodeIds) => {
-          // Update both selectedNodes array and selectedNode for backward compatibility
-          // selectedNode is set to the first node if exactly one is selected, otherwise null
-          const { pause, resume } = useStore.temporal.getState();
-          pause();
-          set({ 
-            selectedNodes: nodeIds,
-            selectedNode: nodeIds.length === 1 ? nodeIds[0] : null,
-          });
-          resume();
-        },
-
-        // Tag management
-        addTag: (name, color) => {
-          const newTag = {
-            id: generateTagId(),
-            name,
-            color,
-          };
-          set({
-            tags: [...get().tags, newTag],
-          });
-          return newTag;
-        },
-
-        updateTag: (tagId, updates) => {
-          set({
-            tags: get().tags.map((tag) =>
-              tag.id === tagId ? { ...tag, ...updates } : tag
-            ),
-          });
-        },
-
-        deleteTag: (tagId) => {
-          // Remove tag and clear it from all nodes
-          set({
-            tags: get().tags.filter((tag) => tag.id !== tagId),
-            nodes: get().nodes.map((node) => ({
-              ...node,
-              data: {
-                ...node.data,
-                primaryTag: node.data.primaryTag === tagId ? null : node.data.primaryTag,
-                tags: node.data.tags.filter((id) => id !== tagId),
-              },
-            })),
-          });
-        },
-
-        // Store node positions before drag starts
-        _preDragNodes: null,
-        
-        // Called when drag starts - save current state and pause history tracking
-        onNodeDragStart: () => {
-          // Save the current nodes state before dragging (deep copy)
-          const preDragNodes = JSON.parse(JSON.stringify(get().nodes));
-          
-          // Pause first, then save (so saving doesn't create history)
+        setSelectedNode: (id) => {
           useStore.temporal.getState().pause();
-          set({ _preDragNodes: preDragNodes });
+          set({ selectedNode: id, selectedNodes: id ? [id] : [] });
+          useStore.temporal.getState().resume();
         },
 
-        // Called when drag ends - create a single history entry for the entire drag operation
+        setSelectedNodes: (ids) => {
+          useStore.temporal.getState().pause();
+          set({ selectedNodes: ids, selectedNode: ids.length === 1 ? ids[0] : null });
+          useStore.temporal.getState().resume();
+        },
+
+        // Tag Actions
+        addTag: (name, color) => {
+          const newTag = { id: generateTagId(), name, color };
+          set({ tags: [...get().tags, newTag], isDirty: true });
+        },
+
+        updateTag: (id, data) => {
+          set({
+            tags: get().tags.map((t) => (t.id === id ? { ...t, ...data } : t)),
+            isDirty: true,
+          });
+        },
+
+        deleteTag: (id) => {
+          set({
+            tags: get().tags.filter((t) => t.id !== id),
+            nodes: get().nodes.map((n) => ({
+              ...n,
+              data: {
+                ...n.data,
+                primaryTag: n.data.primaryTag === id ? null : n.data.primaryTag,
+                tags: n.data.tags.filter(tid => tid !== id)
+              }
+            })),
+            isDirty: true,
+          });
+        },
+
+        // Drag Handling
+        onNodeDragStart: () => {
+          useStore.temporal.getState().pause();
+          set({ _preDragNodes: JSON.parse(JSON.stringify(get().nodes)) });
+        },
+
         onNodeDragStop: () => {
-          const preDragNodes = get()._preDragNodes;
-          const currentNodes = JSON.parse(JSON.stringify(get().nodes)); // Deep copy current state
-          
-          // Check if positions actually changed
-          const changed = preDragNodes && JSON.stringify(preDragNodes) !== JSON.stringify(currentNodes);
+          const preDrag = get()._preDragNodes;
+          const current = get().nodes;
+          const changed = preDrag && JSON.stringify(preDrag) !== JSON.stringify(current);
           
           if (changed) {
-            // While still paused:
-            // 1. Clear _preDragNodes
-            // 2. Set nodes back to preDragNodes
-            set({ _preDragNodes: null, nodes: preDragNodes });
-            
-            // Now resume and set to currentNodes - this creates the history entry
+            set({ _preDragNodes: null, nodes: preDrag });
             useStore.temporal.getState().resume();
-            set({ nodes: currentNodes });
+            set({ nodes: current, isDirty: true });
           } else {
-            // No change, just clean up
             set({ _preDragNodes: null });
             useStore.temporal.getState().resume();
           }
         },
 
-        setCurrentFileName: (name) => {
-          set({ currentFileName: name });
-        },
-
-        // Clear all data
+        // File Actions
         clearAll: () => {
-          set({
-            nodes: [],
-            edges: [],
-            selectedNode: null,
-            selectedNodes: [],
-          });
+          set({ nodes: [], edges: [], selectedNode: null, selectedNodes: [], isDirty: true });
         },
 
-        // Reset to demo data
         resetToDemo: () => {
           set({
             nodes: initialNodes,
@@ -439,109 +347,123 @@ export const useStore = create(
             tags: defaultTags,
             selectedNode: null,
             selectedNodes: [],
+            isDirty: true,
           });
         },
 
-        // Export graph to JSON
         exportToJSON: () => {
           const { nodes, edges, tags } = get();
-          const data = {
-            version: '1.0',
-            exportedAt: new Date().toISOString(),
-            nodes,
-            edges,
-            tags,
-          };
-          return JSON.stringify(data, null, 2);
+          return JSON.stringify({ version: '1.0', exportedAt: new Date().toISOString(), nodes, edges, tags }, null, 2);
         },
 
-        // Import graph from JSON
         importFromJSON: (jsonString) => {
           try {
             const data = JSON.parse(jsonString);
-            if (!data.nodes || !data.edges) {
-              throw new Error('Invalid file format: missing nodes or edges');
-            }
+            if (!data.nodes || !data.edges) throw new Error('Invalid format');
             set({
               nodes: data.nodes,
               edges: data.edges,
-              tags: data.tags || defaultTags, // Use default tags if not in file
+              tags: data.tags || defaultTags,
               selectedNode: null,
+              selectedNodes: [],
+              isDirty: false,
             });
             return { success: true };
-          } catch (error) {
-            return { success: false, error: error.message };
+          } catch (e) {
+            return { success: false, error: e.message };
           }
         },
 
-        // Save to file (triggers download)
-        saveToFile: (filename = 'project.json') => {
-          const json = get().exportToJSON();
-          const blob = new Blob([json], { type: 'application/json' });
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = filename;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url);
-          get().setCurrentFileName(filename);
+        loadFromFile: async () => {
+          try {
+            if ('showOpenFilePicker' in window) {
+              const handle = await getFileHandle();
+              if (!handle) return { success: false, error: 'Cancelled' };
+              const file = await handle.getFile();
+              const result = get().importFromJSON(await file.text());
+              if (result.success) set({ fileHandle: handle, currentFileName: file.name });
+              return result;
+            } else {
+              return new Promise((resolve) => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = async (e) => {
+                  const file = e.target.files[0];
+                  if (!file) return resolve({ success: false, error: 'No file' });
+                  const result = get().importFromJSON(await file.text());
+                  if (result.success) set({ currentFileName: file.name });
+                  resolve(result);
+                };
+                input.click();
+              });
+            }
+          } catch (e) {
+            return { success: false, error: e.message };
+          }
         },
 
-        // Load from file (opens file picker)
-        loadFromFile: () => {
-          return new Promise((resolve) => {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            input.onchange = (e) => {
-              const file = e.target.files[0];
-              if (!file) {
-                resolve({ success: false, error: 'No file selected' });
-                return;
-              }
-              const reader = new FileReader();
-              reader.onload = (event) => {
-                const result = get().importFromJSON(event.target.result);
-                if (result.success) {
-                  get().setCurrentFileName(file.name);
-                }
-                resolve(result);
-              };
-              reader.onerror = () => {
-                resolve({ success: false, error: 'Failed to read file' });
-              };
-              reader.readAsText(file);
-            };
-            input.click();
-          });
+        saveToFile: async () => {
+          const { fileHandle, exportToJSON } = get();
+          if (fileHandle && 'showSaveFilePicker' in window) {
+            try {
+              await writeFile(fileHandle, exportToJSON());
+              set({ isDirty: false, lastSavedAt: new Date().toISOString() });
+              return { success: true };
+            } catch (e) {
+              console.warn('Handle write failed, falling back to Save As', e);
+            }
+          }
+          return get().saveAs();
+        },
+
+        saveAs: async (suggestedName) => {
+          const { exportToJSON, currentFileName } = get();
+          const nameToUse = suggestedName || currentFileName || 'project.json';
+          
+          if ('showSaveFilePicker' in window) {
+            try {
+              const handle = await getNewFileHandle(nameToUse);
+              if (!handle) return { success: false, error: 'Cancelled' };
+              await writeFile(handle, exportToJSON());
+              const file = await handle.getFile();
+              set({ fileHandle: handle, currentFileName: file.name, isDirty: false, lastSavedAt: new Date().toISOString() });
+              return { success: true };
+            } catch (e) {
+              return { success: false, error: e.message };
+            }
+          } else {
+            const blob = new Blob([exportToJSON()], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nameToUse.endsWith('.json') ? nameToUse : `${nameToUse}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            set({ currentFileName: a.download, isDirty: false, lastSavedAt: new Date().toISOString() });
+            return { success: true };
+          }
         },
       }),
       {
-        // Undo/redo configuration (temporal middleware options)
-        partialize: (state) => ({
-          nodes: state.nodes,
-          edges: state.edges,
-        }),
-        limit: 50, // Keep last 50 states
+        partialize: (state) => ({ nodes: state.nodes, edges: state.edges }),
+        limit: 50,
       }
     ),
     {
-      // Persist configuration (persist middleware options)
       name: 'task-dependency-graph-storage',
       partialize: (state) => ({
         nodes: state.nodes,
         edges: state.edges,
         tags: state.tags,
         currentFileName: state.currentFileName,
+        snapshots: state.snapshots,
       }),
     }
   )
 );
 
-// Hook to subscribe to temporal store state changes reactively
-// This follows the pattern from zundo documentation
 export const useTemporalStore = (selector, equality) => {
   return useZustandStore(useStore.temporal, selector, equality);
 };
+

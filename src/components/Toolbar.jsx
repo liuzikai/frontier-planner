@@ -2,10 +2,26 @@ import { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { useTemporalStore } from '../store/useStore';
 import TagManager from './TagManager';
+import SnapshotManager from './SnapshotManager';
 
 const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
-  const { addTask, clearAll, resetToDemo, nodes, saveToFile, loadFromFile, currentFileName, tags } = useStore();
+  const { 
+    addTask, 
+    clearAll, 
+    resetToDemo, 
+    nodes, 
+    saveToFile, 
+    saveAs,
+    loadFromFile, 
+    currentFileName, 
+    isDirty,
+    isNativeFileSystemSupported,
+    tags 
+  } = useStore();
   const [showTagManager, setShowTagManager] = useState(false);
+  const [showSnapshotManager, setShowSnapshotManager] = useState(false);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [downloadFileName, setDownloadFileName] = useState('');
   
   // Subscribe to temporal store reactively
   const undo = useTemporalStore((state) => state.undo);
@@ -31,16 +47,53 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
     }
   };
 
-  const handleSave = () => {
-    const filename = currentFileName || 'project.json';
-    saveToFile(filename);
+  const handleSave = async () => {
+    if (!isNativeFileSystemSupported) {
+      setDownloadFileName(currentFileName || 'project.json');
+      setShowDownloadModal(true);
+      return;
+    }
+    const result = await saveToFile();
+    if (result && !result.success && result.error !== 'Cancelled') {
+      alert(`Failed to save: ${result.error}`);
+    }
+  };
+
+  const handleConfirmDownload = async (e) => {
+    e.preventDefault();
+    const result = await saveAs(downloadFileName);
+    if (result && result.success) {
+      setShowDownloadModal(false);
+    } else if (result && result.error !== 'Cancelled') {
+      alert(`Failed to download: ${result.error}`);
+    }
+  };
+
+  const handleSaveAs = async () => {
+    const result = await saveAs();
+    if (result && !result.success && result.error !== 'Cancelled') {
+      alert(`Failed to save: ${result.error}`);
+    }
   };
 
   const handleOpen = async () => {
     const result = await loadFromFile();
-    if (!result.success) {
+    if (result && !result.success && result.error !== 'Cancelled') {
       alert(`Failed to open file: ${result.error}`);
     }
+  };
+
+  const handleNew = () => {
+    if (isDirty && !window.confirm('You have unsaved changes. Create new project anyway?')) {
+      return;
+    }
+    useStore.setState({ 
+      nodes: [], 
+      edges: [], 
+      fileHandle: null, 
+      currentFileName: null, 
+      isDirty: false 
+    });
   };
 
   const canUndo = pastStates.length > 0;
@@ -61,26 +114,77 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
   return (
     <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
       {/* File Operations */}
-      <button
-        onClick={handleOpen}
-        className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 rounded-xl hover:bg-gray-50 transition-all shadow-xl border border-gray-200 active:scale-95"
-        title="Open file (JSON)"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M2 6a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1H8a3 3 0 00-3 3v1.5a1.5 1.5 0 01-3 0V6z" clipRule="evenodd" />
-          <path d="M6 12a2 2 0 012-2h8a2 2 0 012 2v2a2 2 0 01-2 2H2h2a2 2 0 002-2v-2z" />
-        </svg>
-      </button>
-
-      <button
-        onClick={handleSave}
-        className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 rounded-xl hover:bg-gray-50 transition-all shadow-xl border border-gray-200 active:scale-95"
-        title="Save to file (JSON)"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M9.707 7.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 8.586V5h3a2 2 0 012 2v9a2 2 0 01-2 2H4a2 2 0 01-2-2V7a2 2 0 012-2h3v3.586L5.707 7.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L9 8.586V5h.001L9.707 7.293z" />
-        </svg>
-      </button>
+      <div className="flex items-center bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
+        <button
+          onClick={handleNew}
+          className="p-2 text-gray-600 hover:bg-gray-50 transition-colors border-r border-gray-100"
+          title="New Project"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="12" y1="18" x2="12" y2="12"></line>
+            <line x1="9" y1="15" x2="15" y2="15"></line>
+          </svg>
+        </button>
+        <button
+          onClick={handleOpen}
+          className="p-2 text-gray-600 hover:bg-gray-50 transition-colors border-r border-gray-100"
+          title="Open File"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </button>
+        
+        {isNativeFileSystemSupported ? (
+          <>
+            <button
+              onClick={handleSave}
+              className="p-2 text-gray-600 hover:bg-gray-50 transition-colors border-r border-gray-100 relative"
+              title="Save (Ctrl+S)"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+              </svg>
+              {isDirty && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-orange-500 rounded-full border border-white" />
+              )}
+            </button>
+            <button
+              onClick={handleSaveAs}
+              className="p-2 text-gray-600 hover:bg-gray-50 transition-colors"
+              title="Save As..."
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <path d="M7 3v5h8"></path>
+                <circle cx="18" cy="18" r="3"></circle>
+                <line x1="18" y1="16" x2="18" y2="20"></line>
+                <line x1="16" y1="18" x2="20" y2="18"></line>
+              </svg>
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={handleSave}
+            className="p-2 text-gray-600 hover:bg-gray-50 transition-colors relative"
+            title="Download Project"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            {isDirty && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-orange-500 rounded-full border border-white" />
+            )}
+          </button>
+        )}
+      </div>
 
       {/* Divider */}
       <div className="w-px h-8 bg-gray-300 mx-1" />
@@ -144,6 +248,17 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
         </svg>
       </button>
 
+      {/* Snapshots Button */}
+      <button
+        onClick={() => setShowSnapshotManager(true)}
+        className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 rounded-xl hover:bg-gray-50 transition-all shadow-xl border border-gray-200 active:scale-95"
+        title="Version Snapshots"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
+        </svg>
+      </button>
+
       {/* Reset Demo Button */}
       <button
         onClick={handleResetDemo}
@@ -171,13 +286,67 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
 
       {/* Current File Name */}
       {currentFileName && (
-        <div className="px-4 py-2 bg-blue-50 rounded-xl shadow-xl border border-blue-200 text-sm font-bold text-blue-700 animate-in slide-in-from-top-2 duration-300">
-          {currentFileName}
+        <div className={`px-4 py-2 rounded-xl shadow-xl border text-sm font-bold transition-all duration-300 flex items-center gap-2 ${
+          isDirty 
+            ? 'bg-orange-50 border-orange-200 text-orange-700' 
+            : 'bg-blue-50 border-blue-200 text-blue-700'
+        }`}>
+          <span className="max-w-[150px] truncate">{currentFileName}</span>
+          {isDirty && <span className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse" />}
         </div>
       )}
 
       {/* Tag Manager Modal */}
       <TagManager isOpen={showTagManager} onClose={() => setShowTagManager(false)} />
+
+      {/* Snapshot Manager Modal */}
+      <SnapshotManager isOpen={showSnapshotManager} onClose={() => setShowSnapshotManager(false)} />
+
+      {/* Download Filename Modal (Safari/Legacy) */}
+      {showDownloadModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-gray-100 animate-in zoom-in-95 duration-200">
+            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+              <h2 className="text-sm font-bold text-gray-800">Download Project</h2>
+              <button onClick={() => setShowDownloadModal(false)} className="text-gray-400 hover:text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <form onSubmit={handleConfirmDownload} className="p-4 space-y-4">
+              <div>
+                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1 ml-1">
+                  Filename
+                </label>
+                <input
+                  autoFocus
+                  type="text"
+                  value={downloadFileName}
+                  onChange={(e) => setDownloadFileName(e.target.value)}
+                  placeholder="project.json"
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                />
+              </div>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowDownloadModal(false)}
+                  className="flex-1 px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-sm font-bold hover:bg-gray-200 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20"
+                >
+                  Download
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
