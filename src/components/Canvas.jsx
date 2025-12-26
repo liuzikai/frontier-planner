@@ -47,6 +47,8 @@ const Canvas = () => {
     loadFromFile,
     lastLoadedAt,
     isDirty,
+    darkMode,
+    toggleDarkMode
   } = useStore();
 
   const undo = useTemporalStore((state) => state.undo);
@@ -276,7 +278,7 @@ const Canvas = () => {
     <div className="flex h-screen w-full">
       {/* Main Canvas */}
       <div className="flex-1 relative">
-        <Toolbar getViewportCenter={getViewportCenter} showMiniMap={showMiniMap} setShowMiniMap={setShowMiniMap} />
+        <Toolbar getViewportCenter={getViewportCenter} />
         <ReactFlow
           nodes={nodesWithSelection}
           edges={edgesWithStyle}
@@ -308,17 +310,44 @@ const Canvas = () => {
             variant={BackgroundVariant.Dots}
             gap={20}
             size={1}
-            color="#e5e7eb"
+            color={darkMode ? '#374151' : '#e5e7eb'}
           />
-          <Controls className="!bg-white !rounded-xl !shadow-xl !border !border-gray-100 !overflow-hidden">
+          <Controls className="!bg-white dark:!bg-gray-800 !rounded-xl !shadow-xl !border !border-gray-200 dark:!border-gray-700 !overflow-hidden">
             <ControlButton
               onClick={() => setShowMiniMap(!showMiniMap)}
               title={showMiniMap ? 'Hide minimap' : 'Show minimap'}
-              className={showMiniMap ? '!bg-blue-50 !text-blue-600' : ''}
+              className={showMiniMap 
+                ? '!bg-blue-50 dark:!bg-blue-900/40 !text-blue-600 dark:!text-blue-400 !border-none' 
+                : '!bg-white dark:!bg-gray-800 !text-gray-600 dark:!text-gray-400 hover:!bg-gray-50 dark:hover:!bg-gray-700 !border-none'}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293zM17.707 5.293L14 1.586v12.828l2.293 2.293A1 1 0 0018 16V6a1 1 0 00-.293-.707z" clipRule="evenodd" />
               </svg>
+            </ControlButton>
+            <ControlButton
+              onClick={toggleDarkMode}
+              title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              className={darkMode 
+                ? '!bg-blue-50 dark:!bg-blue-900/40 !text-blue-600 dark:!text-blue-400 !border-none' 
+                : '!bg-white dark:!bg-gray-800 !text-gray-600 dark:!text-gray-400 hover:!bg-gray-50 dark:hover:!bg-gray-700 !border-none'}
+            >
+              {darkMode ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="5"></circle>
+                  <line x1="12" y1="1" x2="12" y2="3"></line>
+                  <line x1="12" y1="21" x2="12" y2="23"></line>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                  <line x1="1" y1="12" x2="3" y2="12"></line>
+                  <line x1="21" y1="12" x2="23" y2="12"></line>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+              )}
             </ControlButton>
           </Controls>
           {showMiniMap && (
@@ -332,7 +361,7 @@ const Canvas = () => {
                   case 'in-progress':
                     return '#3b82f6';
                   default:
-                    return '#9ca3af';
+                    return darkMode ? '#4b5563' : '#9ca3af';
                 }
               }}
               nodeStrokeColor={(node) => {
@@ -341,8 +370,8 @@ const Canvas = () => {
                 return 'transparent';
               }}
               nodeStrokeWidth={(node) => (node.selected || node.data?.isFrontier ? 4 : 0)}
-              maskColor="rgba(243, 244, 246, 0.6)"
-              className="!bg-white/80 !backdrop-blur-md !rounded-2xl !shadow-2xl !border !border-gray-100 !left-10 animate-in fade-in slide-in-from-left-5 duration-500"
+              maskColor={darkMode ? "rgba(0, 0, 0, 0.4)" : "rgba(243, 244, 246, 0.6)"}
+              className="!bg-white/80 dark:!bg-gray-800/80 !backdrop-blur-md !rounded-2xl !shadow-2xl !border !border-gray-200 dark:!border-gray-700 !left-10 animate-in fade-in slide-in-from-left-5 duration-500"
               style={{ width: 200, height: 140 }}
               position="bottom-left"
             />

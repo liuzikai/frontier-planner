@@ -5,10 +5,10 @@ import { formatTime } from '../utils/timeUtils';
 import Tooltip from './Tooltip';
 
 const statusColors = {
-  'todo': 'bg-gray-100 border-gray-300 text-gray-700',
-  'in-progress': 'bg-blue-50 border-blue-400 text-blue-700',
-  'done': 'bg-green-50 border-green-400 text-green-700',
-  'someday': 'bg-gray-100 border-gray-300 border-dashed text-gray-700',
+  'todo': 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300',
+  'in-progress': 'bg-blue-50 dark:bg-blue-900/30 border-blue-400 dark:border-blue-700 text-blue-700 dark:text-blue-300',
+  'done': 'bg-green-50 dark:bg-green-900/30 border-green-400 dark:border-green-700 text-green-700 dark:text-green-300',
+  'someday': 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 border-dashed text-gray-700 dark:text-gray-400',
 };
 
 const statusLabels = {
@@ -39,15 +39,15 @@ const TaskNode = ({ id, data, selected }) => {
         className={`
           min-w-[180px] max-w-[240px] rounded-xl shadow-xl border-2 transition-all duration-300
           ${statusColors[data.status]}
-          ${selected ? 'ring-2 ring-purple-500 ring-offset-4 scale-105 shadow-2xl' : 'hover:shadow-2xl hover:-translate-y-1'}
-          ${data.isFrontier ? 'ring-4 ring-orange-500 ring-offset-2 shadow-orange-500/30' : ''}
+          ${selected ? 'ring-2 ring-purple-500 ring-offset-4 ring-offset-white dark:ring-offset-gray-900 scale-105 shadow-2xl' : 'hover:shadow-2xl hover:-translate-y-1'}
+          ${data.isFrontier ? 'ring-4 ring-orange-500 ring-offset-2 ring-offset-white dark:ring-offset-gray-900 shadow-orange-500/30' : ''}
         `}
       >
         {/* Input Handle (left side) */}
         <Handle
           type="target"
           position={Position.Left}
-          className="!w-3.5 !h-3.5 !bg-blue-500 !border-2 !border-white !shadow-md hover:!scale-125 transition-transform"
+          className="!w-3.5 !h-3.5 !bg-blue-500 !border-2 !border-white dark:!border-gray-900 !shadow-md hover:!scale-125 transition-transform"
         />
 
         {/* Header */}
@@ -55,7 +55,7 @@ const TaskNode = ({ id, data, selected }) => {
           {/* Delete button - Absolutely positioned */}
           <button
             onClick={handleDelete}
-            className="absolute top-1.5 right-1.5 text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-50 opacity-0 group-hover:opacity-100"
+            className="absolute top-1.5 right-1.5 text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100"
             title="Delete task"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
@@ -68,7 +68,7 @@ const TaskNode = ({ id, data, selected }) => {
             <div className="flex flex-wrap gap-1 mb-1.5">
               {primaryTag && (
                 <span
-                  className="inline-block text-[9px] px-1.5 py-0.5 rounded-full font-bold text-gray-800 border shadow-sm"
+                  className="inline-block text-[9px] px-1.5 py-0.5 rounded-full font-bold text-gray-800 dark:text-gray-200 border shadow-sm"
                   style={{ 
                     backgroundColor: `${primaryTag.color}20`,
                     borderColor: `${primaryTag.color}50`,
@@ -77,19 +77,19 @@ const TaskNode = ({ id, data, selected }) => {
                   {primaryTag.name}
                 </span>
               )}
-              <span className="inline-block text-[9px] px-1.5 py-0.5 rounded-full font-bold bg-white/50 text-gray-600 border border-gray-200 shadow-sm">
+              <span className="inline-block text-[9px] px-1.5 py-0.5 rounded-full font-bold bg-white/50 dark:bg-black/20 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 shadow-sm">
                 {statusLabels[data.status]}
               </span>
               {data.estimatedTime && (
-                <span className="inline-block text-[9px] px-1.5 py-0.5 rounded-full font-bold bg-white/50 text-gray-600 border border-gray-200 shadow-sm">
+                <span className="inline-block text-[9px] px-1.5 py-0.5 rounded-full font-bold bg-white/50 dark:bg-black/20 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 shadow-sm">
                   ⏱ {data.estimatedTime} {(data.estimatedTimeUnit || 'days').charAt(0)}
                 </span>
               )}
             </div>
-            <h3 className="font-bold text-[13px] leading-tight break-words text-gray-800">
+            <h3 className="font-bold text-[13px] leading-tight break-words text-gray-800 dark:text-gray-100">
               {data.title || 'Untitled Task'}
               {data.note && (
-                <span className="text-gray-400 ml-1 inline-block" style={{ verticalAlign: '0.05em' }} title="Has note">
+                <span className="text-gray-400 dark:text-gray-500 ml-1 inline-block" style={{ verticalAlign: '0.05em' }} title="Has note">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 inline" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
                   </svg>
@@ -102,7 +102,7 @@ const TaskNode = ({ id, data, selected }) => {
         {/* Body */}
         {data.description && (
           <div className="px-3 py-2">
-            <p className="text-[11px] text-gray-600 leading-relaxed line-clamp-2">
+            <p className="text-[11px] text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2">
               {data.description}
             </p>
           </div>
@@ -112,7 +112,7 @@ const TaskNode = ({ id, data, selected }) => {
         <Handle
           type="source"
           position={Position.Right}
-          className="!w-3.5 !h-3.5 !bg-green-500 !border-2 !border-white !shadow-md hover:!scale-125 transition-transform"
+          className="!w-3.5 !h-3.5 !bg-green-500 !border-2 !border-white dark:!border-gray-900 !shadow-md hover:!scale-125 transition-transform"
         />
         
         {/* Cumulative Time Display - on top of node, right side */}

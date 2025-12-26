@@ -62,7 +62,7 @@ const TagManager = ({ isOpen, onClose }) => {
           key={preset.value}
           onClick={() => onChange(preset.value)}
           className={`w-8 h-8 rounded-full border-2 transition-all hover:scale-110 ${
-            selectedColor === preset.value ? 'border-gray-900 ring-2 ring-gray-200' : 'border-transparent'
+            selectedColor === preset.value ? 'border-gray-900 dark:border-gray-100 ring-2 ring-gray-200 dark:ring-gray-800' : 'border-transparent'
           }`}
           style={{ backgroundColor: preset.value }}
           title={preset.name}
@@ -77,13 +77,13 @@ const TagManager = ({ isOpen, onClose }) => {
           title="Custom color"
         />
         <div 
-          className={`w-8 h-8 rounded-full border-2 flex items-center justify-center bg-white transition-all group-hover:scale-110 ${
+          className={`w-8 h-8 rounded-full border-2 flex items-center justify-center bg-white dark:bg-gray-800 transition-all group-hover:scale-110 ${
             !colorPresets.some(p => p.value === selectedColor) 
-              ? 'border-gray-900 ring-2 ring-gray-200' 
-              : 'border-gray-300'
+              ? 'border-gray-900 dark:border-gray-100 ring-2 ring-gray-200 dark:ring-gray-800' 
+              : 'border-gray-300 dark:border-gray-700'
           }`}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500 dark:text-gray-400" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clipRule="evenodd" />
           </svg>
         </div>
@@ -93,13 +93,13 @@ const TagManager = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden border border-white/20">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden border border-white/20 dark:border-gray-700">
         {/* Header */}
-        <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-          <h2 className="text-xl font-bold text-gray-900 tracking-tight">Manage Tags</h2>
+        <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">Manage Tags</h2>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-gray-200 text-gray-400 hover:text-gray-600 transition-all active:scale-90"
+            className="p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-all active:scale-90"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -111,7 +111,7 @@ const TagManager = ({ isOpen, onClose }) => {
         <div className="flex-1 overflow-y-auto p-6 space-y-8">
           {/* Add new tag */}
           <div className="space-y-4">
-            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Create New Tag</h3>
+            <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Create New Tag</h3>
             <div className="space-y-4">
               <input
                 type="text"
@@ -119,14 +119,14 @@ const TagManager = ({ isOpen, onClose }) => {
                 onChange={(e) => setNewTagName(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
                 placeholder="Tag name (e.g. Engineering)"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm font-medium text-gray-800"
+                className="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm font-medium text-gray-800 dark:text-gray-100"
               />
               <div className="flex items-center justify-between gap-4">
                 <ColorSelector selectedColor={newTagColor} onChange={setNewTagColor} />
                 <button
                   onClick={handleAddTag}
                   disabled={!newTagName.trim()}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold shadow-lg shadow-blue-200 active:scale-95"
+                  className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold shadow-lg shadow-blue-200 dark:shadow-none active:scale-95"
                 >
                   Create
                 </button>
@@ -136,17 +136,17 @@ const TagManager = ({ isOpen, onClose }) => {
 
           {/* Existing tags */}
           <div className="space-y-4">
-            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Existing Tags</h3>
+            <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Existing Tags</h3>
             <div className="space-y-3">
               {tags.length === 0 ? (
-                <div className="text-center py-10 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-                  <p className="text-sm text-gray-400 font-medium">No tags yet. Create your first one above!</p>
+                <div className="text-center py-10 bg-gray-50 dark:bg-gray-800/30 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
+                  <p className="text-sm text-gray-400 dark:text-gray-500 font-medium">No tags yet. Create your first one above!</p>
                 </div>
               ) : (
                 tags.map((tag) => (
                   <div
                     key={tag.id}
-                    className="group relative bg-white border border-gray-100 rounded-xl p-3.5 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-50/50 transition-all duration-300"
+                    className="group relative bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-3.5 hover:border-blue-200 dark:hover:border-blue-900 hover:shadow-xl hover:shadow-blue-50/50 dark:hover:shadow-none transition-all duration-300"
                   >
                     {editingId === tag.id ? (
                       <div className="space-y-4">
@@ -155,7 +155,7 @@ const TagManager = ({ isOpen, onClose }) => {
                           value={editName}
                           onChange={(e) => setEditName(e.target.value)}
                           onKeyPress={(e) => e.key === 'Enter' && handleSaveEdit()}
-                          className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-medium text-gray-800"
+                          className="w-full px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-medium text-gray-800 dark:text-gray-100"
                           autoFocus
                         />
                         <div className="flex items-center justify-between">
@@ -172,7 +172,7 @@ const TagManager = ({ isOpen, onClose }) => {
                             </button>
                             <button
                               onClick={handleCancelEdit}
-                              className="p-2.5 bg-gray-100 text-gray-500 rounded-xl hover:bg-gray-200 transition-all active:scale-95"
+                              className="p-2.5 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all active:scale-95"
                               title="Cancel"
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -189,13 +189,13 @@ const TagManager = ({ isOpen, onClose }) => {
                           style={{ backgroundColor: tag.color }}
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="font-bold text-gray-900 truncate">{tag.name}</p>
-                          <p className="text-[10px] text-gray-400 font-mono uppercase tracking-wider">{tag.color}</p>
+                          <p className="font-bold text-gray-900 dark:text-gray-100 truncate">{tag.name}</p>
+                          <p className="text-[10px] text-gray-400 dark:text-gray-500 font-mono uppercase tracking-wider">{tag.color}</p>
                         </div>
                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
                           <button
                             onClick={() => handleStartEdit(tag)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
+                            className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/50 rounded-xl transition-colors"
                             title="Edit tag"
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -204,7 +204,7 @@ const TagManager = ({ isOpen, onClose }) => {
                           </button>
                           <button
                             onClick={() => handleDelete(tag.id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                            className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/50 rounded-xl transition-colors"
                             title="Delete tag"
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -222,10 +222,10 @@ const TagManager = ({ isOpen, onClose }) => {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-5 border-t border-gray-100 flex justify-end bg-gray-50/50">
+        <div className="px-6 py-5 border-t border-gray-100 dark:border-gray-800 flex justify-end bg-gray-50/50 dark:bg-gray-900/50">
           <button
             onClick={onClose}
-            className="px-8 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-all font-bold shadow-sm active:scale-95"
+            className="px-8 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all font-bold shadow-sm active:scale-95"
           >
             Done
           </button>

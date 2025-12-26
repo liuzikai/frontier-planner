@@ -45,7 +45,7 @@ When you select a task, the app calculates how long it will take to reach it fro
 
 ### UI/UX Features
 - **High-Density SaaS UI**: Professional, compact interface designed for productivity.
-- **"Silver Bullet" File Management**:
+- **"Frontier Planner" File Management**:
   - **Native File System Access**: Direct "Save" (Ctrl+S) support in Chromium browsers (Chrome, Edge) for in-place file editing.
   - **Cross-Browser Fallback**: Intelligent download-based saving for Safari and Firefox with custom filename control.
   - **Unsaved Changes Tracking**: Visual indicators (orange/blue filename) and confirmation prompts to prevent data loss.

@@ -14,11 +14,11 @@ const SnapshotManager = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100">
-        <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-          <h2 className="text-lg font-bold text-gray-800">Version Snapshots</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 dark:bg-black/40 backdrop-blur-sm p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100 dark:border-gray-700">
+        <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
+          <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">Version Snapshots</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -32,7 +32,7 @@ const SnapshotManager = ({ isOpen, onClose }) => {
               value={newSnapshotName}
               onChange={(e) => setNewSnapshotName(e.target.value)}
               placeholder="Snapshot name (optional)"
-              className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+              className="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all dark:text-gray-100"
             />
             <button
               type="submit"
@@ -44,20 +44,20 @@ const SnapshotManager = ({ isOpen, onClose }) => {
 
           <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
             {snapshots.length === 0 ? (
-              <div className="text-center py-8 text-gray-400 italic text-sm">
+              <div className="text-center py-8 text-gray-400 dark:text-gray-500 italic text-sm">
                 No snapshots yet. Create one to save a version of your graph.
               </div>
             ) : (
               snapshots.map((snapshot) => (
                 <div
                   key={snapshot.id}
-                  className="group flex items-center justify-between p-3 bg-gray-50 hover:bg-blue-50 rounded-xl border border-gray-100 hover:border-blue-100 transition-all"
+                  className="group flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-blue-100 dark:hover:border-blue-800 transition-all"
                 >
                   <div className="flex-1 min-w-0 mr-4">
-                    <div className="text-sm font-bold text-gray-800 truncate">
+                    <div className="text-sm font-bold text-gray-800 dark:text-gray-200 truncate">
                       {snapshot.name}
                     </div>
-                    <div className="text-[11px] text-gray-400">
+                    <div className="text-[11px] text-gray-400 dark:text-gray-500">
                       {new Date(snapshot.timestamp).toLocaleString()}
                     </div>
                   </div>
@@ -69,7 +69,7 @@ const SnapshotManager = ({ isOpen, onClose }) => {
                           onClose();
                         }
                       }}
-                      className="p-1.5 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                      className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg transition-colors"
                       title="Restore"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -78,7 +78,7 @@ const SnapshotManager = ({ isOpen, onClose }) => {
                     </button>
                     <button
                       onClick={() => deleteSnapshot(snapshot.id)}
-                      className="p-1.5 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                      className="p-1.5 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-lg transition-colors"
                       title="Delete"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">

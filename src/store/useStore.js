@@ -248,9 +248,12 @@ export const useStore = create(
         lastSavedAt: null,
         snapshots: [], // Persisted versions
         isNativeFileSystemSupported: 'showSaveFilePicker' in window && window.isSecureContext,
+        darkMode: false,
         _preDragNodes: null,
 
-        // ... existing actions ...
+        // Actions
+        toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
+
         createSnapshot: (name) => {
           const { nodes, edges, tags } = get();
           const snapshot = {
@@ -545,6 +548,7 @@ export const useStore = create(
         currentFileName: state.currentFileName,
         isDirty: state.isDirty,
         snapshots: state.snapshots,
+        darkMode: state.darkMode,
       }),
     }
   )

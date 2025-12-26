@@ -3,7 +3,7 @@ import { useStore } from '../store/useStore';
 import { useTemporalStore } from '../store/useStore';
 import TagManager from './TagManager';
 
-const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
+const Toolbar = ({ getViewportCenter }) => {
   const { 
     addTask, 
     resetToDemo, 
@@ -14,7 +14,7 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
     currentFileName, 
     isDirty,
     isNativeFileSystemSupported,
-    tags 
+    tags
   } = useStore();
   const [showTagManager, setShowTagManager] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
@@ -96,10 +96,10 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
   return (
     <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
       {/* File Operations */}
-      <div className="flex items-center bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
+      <div className="flex items-center bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
         <button
           onClick={handleNew}
-          className="p-2 text-gray-600 hover:bg-gray-50 transition-colors border-r border-gray-100"
+          className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-r border-gray-200 dark:border-gray-700"
           title="New Project"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -111,7 +111,7 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
         </button>
         <button
           onClick={handleOpen}
-          className="p-2 text-gray-600 hover:bg-gray-50 transition-colors border-r border-gray-100"
+          className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border-r border-gray-200 dark:border-gray-700"
           title="Open File"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -123,7 +123,7 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
           <>
             <button
               onClick={handleSave}
-              className="p-2 text-gray-600 hover:bg-gray-50 transition-colors border-r border-gray-100 relative"
+              className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-r border-gray-200 dark:border-gray-700 relative"
               title="Save (Ctrl+S)"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -132,12 +132,12 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
                 <polyline points="7 3 7 8 15 8"></polyline>
               </svg>
               {isDirty && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-orange-500 rounded-full border border-white" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-orange-500 rounded-full border border-white dark:border-gray-800" />
               )}
             </button>
             <button
               onClick={handleSaveAs}
-              className="p-2 text-gray-600 hover:bg-gray-50 transition-colors"
+              className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               title="Save As..."
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -153,7 +153,7 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
         ) : (
           <button
             onClick={handleSave}
-            className="p-2 text-gray-600 hover:bg-gray-50 transition-colors relative"
+            className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors relative"
             title="Download Project"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -162,23 +162,23 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
             {isDirty && (
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-orange-500 rounded-full border border-white" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-orange-500 rounded-full border border-white dark:border-gray-800" />
             )}
           </button>
         )}
       </div>
 
       {/* Divider */}
-      <div className="w-px h-8 bg-gray-300 mx-1" />
+      <div className="w-px h-8 bg-gray-300 dark:bg-gray-700 mx-1" />
 
       {/* Undo/Redo */}
       <button
         onClick={() => undo()}
         disabled={!canUndo}
-        className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all shadow-xl border border-gray-200 active:scale-95 ${
+        className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all shadow-xl border border-gray-200 dark:border-gray-700 active:scale-95 ${
           canUndo
-            ? 'bg-white text-gray-700 hover:bg-gray-50'
-            : 'bg-gray-50 text-gray-300 cursor-not-allowed'
+            ? 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+            : 'bg-gray-50 dark:bg-gray-800/50 text-gray-300 dark:text-gray-700 cursor-not-allowed'
         }`}
         title="Undo (Ctrl+Z)"
       >
@@ -190,10 +190,10 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
       <button
         onClick={() => redo()}
         disabled={!canRedo}
-        className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all shadow-xl border border-gray-200 active:scale-95 ${
+        className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all shadow-xl border border-gray-200 dark:border-gray-700 active:scale-95 ${
           canRedo
-            ? 'bg-white text-gray-700 hover:bg-gray-50'
-            : 'bg-gray-50 text-gray-300 cursor-not-allowed'
+            ? 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
+            : 'bg-gray-50 dark:bg-gray-800/50 text-gray-300 dark:text-gray-700 cursor-not-allowed'
         }`}
         title="Redo (Ctrl+Y)"
       >
@@ -203,7 +203,7 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
       </button>
 
       {/* Divider */}
-      <div className="w-px h-8 bg-gray-300 mx-1" />
+      <div className="w-px h-8 bg-gray-300 dark:bg-gray-700 mx-1" />
 
       {/* Add Task Button */}
       <button
@@ -217,12 +217,12 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
       </button>
 
       {/* Divider */}
-      <div className="w-px h-8 bg-gray-300 mx-1" />
+      <div className="w-px h-8 bg-gray-300 dark:bg-gray-700 mx-1" />
 
       {/* Manage Tags Button */}
       <button
         onClick={() => setShowTagManager(true)}
-        className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 rounded-xl hover:bg-gray-50 transition-all shadow-xl border border-gray-200 active:scale-95"
+        className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-xl border border-gray-200 dark:border-gray-700 active:scale-95"
         title="Manage tags"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -231,14 +231,14 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
       </button>
 
       {/* Divider */}
-      <div className="w-px h-8 bg-gray-300 mx-1" />
+      <div className="w-px h-8 bg-gray-300 dark:bg-gray-700 mx-1" />
 
       {/* Current File Name */}
       {currentFileName && (
         <div className={`px-4 py-2 rounded-xl shadow-xl border text-sm font-bold transition-all duration-300 flex items-center gap-2 ${
           isDirty 
-            ? 'bg-orange-50 border-orange-200 text-orange-700' 
-            : 'bg-blue-50 border-blue-200 text-blue-700'
+            ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-700 text-orange-700 dark:text-orange-400' 
+            : 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-400'
         }`}>
           <span className="max-w-[150px] truncate">{currentFileName}</span>
           {isDirty && <span className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse" />}
@@ -250,11 +250,11 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
 
       {/* Download Filename Modal (Safari/Legacy) */}
       {showDownloadModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-gray-100 animate-in zoom-in-95 duration-200">
-            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-              <h2 className="text-sm font-bold text-gray-800">Download Project</h2>
-              <button onClick={() => setShowDownloadModal(false)} className="text-gray-400 hover:text-gray-600">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 dark:bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-gray-200 dark:border-gray-700 animate-in zoom-in-95 duration-200">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
+              <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100">Download Project</h2>
+              <button onClick={() => setShowDownloadModal(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -262,7 +262,7 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
             </div>
             <form onSubmit={handleConfirmDownload} className="p-4 space-y-4">
               <div>
-                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1 ml-1">
+                <label className="block text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1 ml-1">
                   Filename
                 </label>
                 <input
@@ -271,14 +271,14 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
                   value={downloadFileName}
                   onChange={(e) => setDownloadFileName(e.target.value)}
                   placeholder="project.json"
-                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all dark:text-gray-100"
                 />
               </div>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setShowDownloadModal(false)}
-                  className="flex-1 px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-sm font-bold hover:bg-gray-200 transition-all"
+                  className="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-xl text-sm font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
                 >
                   Cancel
                 </button>
