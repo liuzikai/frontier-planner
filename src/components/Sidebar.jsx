@@ -16,6 +16,19 @@ const Sidebar = ({ onMinimize }) => {
   const selectedNodeData = nodes.find((node) => node.id === selectedNode);
   const debounceTimerRef = useRef(null);
   const pendingChangesRef = useRef(null);
+  const titleRef = useRef(null);
+
+  // Auto-resize title textarea
+  const adjustTitleHeight = useCallback(() => {
+    if (titleRef.current) {
+      titleRef.current.style.height = 'auto';
+      titleRef.current.style.height = `${titleRef.current.scrollHeight}px`;
+    }
+  }, []);
+
+  useEffect(() => {
+    adjustTitleHeight();
+  }, [formData.title, selectedNode, adjustTitleHeight]);
 
   // All hooks must be called before any conditional returns
   const handleChange = useCallback((e) => {
@@ -98,7 +111,7 @@ const Sidebar = ({ onMinimize }) => {
       <div className="w-80 h-screen bg-white border-l border-gray-200 shadow-2xl flex flex-col z-20">
         {/* Header with minimize button */}
         <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-          <h2 className="font-bold text-gray-900 tracking-tight">Task Graph</h2>
+          <h2 className="font-bold text-gray-900 tracking-tight">Frontier Planner</h2>
           <button
             onClick={onMinimize}
             className="p-1.5 rounded-full hover:bg-gray-200 text-gray-400 hover:text-gray-600 transition-all active:scale-90"
@@ -227,12 +240,13 @@ const Sidebar = ({ onMinimize }) => {
           <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider">
             Title
           </label>
-          <input
-            type="text"
+          <textarea
+            ref={titleRef}
             name="title"
             value={formData.title}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm text-sm font-bold text-gray-800"
+            rows={1}
+            className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm text-sm font-bold text-gray-800 resize-none overflow-hidden leading-relaxed"
             placeholder="Enter task title..."
           />
         </div>
@@ -355,7 +369,7 @@ const Sidebar = ({ onMinimize }) => {
             value={formData.note}
             onChange={handleChange}
             rows={3}
-            className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none shadow-sm text-sm text-gray-600 leading-relaxed italic"
+            className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none shadow-sm text-sm text-gray-600 leading-relaxed"
             placeholder="Add private notes..."
           />
         </div>

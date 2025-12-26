@@ -51,7 +51,7 @@ const TaskNode = ({ id, data, selected }) => {
         />
 
         {/* Header */}
-        <div className={`px-3 py-2.5 ${data.description ? 'border-b border-inherit' : ''} relative`}>
+        <div className={`px-3 pt-2.5 ${data.description ? 'pb-2.5 border-b border-inherit' : 'pb-3.5'} relative`}>
           {/* Delete button - Absolutely positioned */}
           <button
             onClick={handleDelete}
@@ -86,7 +86,7 @@ const TaskNode = ({ id, data, selected }) => {
                 </span>
               )}
             </div>
-            <h3 className="font-bold text-[13px] leading-tight break-words text-gray-800 line-clamp-2">
+            <h3 className="font-bold text-[13px] leading-tight break-words text-gray-800">
               {data.title || 'Untitled Task'}
               {data.note && (
                 <span className="text-gray-400 ml-1 inline-block" style={{ verticalAlign: '0.05em' }} title="Has note">
@@ -100,13 +100,13 @@ const TaskNode = ({ id, data, selected }) => {
         </div>
 
         {/* Body */}
-        <div className="px-3 py-2">
-          {data.description && (
+        {data.description && (
+          <div className="px-3 py-2">
             <p className="text-[11px] text-gray-600 leading-relaxed line-clamp-2">
               {data.description}
             </p>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Output Handle (right side) */}
         <Handle
