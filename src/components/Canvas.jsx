@@ -73,11 +73,16 @@ const Canvas = () => {
         e.preventDefault();
         redo();
       }
+      // Select All: Ctrl+A or Cmd+A
+      if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+        e.preventDefault();
+        setSelectedNodes(nodes.map(node => node.id));
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [saveToFile, loadFromFile, undo, redo]);
+  }, [saveToFile, loadFromFile, undo, redo, nodes, setSelectedNodes]);
   
   // Get React Flow instance to access viewport
   const reactFlowInstance = useReactFlow();
