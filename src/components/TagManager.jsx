@@ -92,14 +92,14 @@ const TagManager = ({ isOpen, onClose }) => {
   );
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden border border-white/20">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-          <h2 className="text-lg font-semibold text-gray-800">Manage Tags</h2>
+        <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+          <h2 className="text-xl font-bold text-gray-900 tracking-tight">Manage Tags</h2>
           <button
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-gray-200 text-gray-500 transition-colors"
+            className="p-1.5 rounded-full hover:bg-gray-200 text-gray-400 hover:text-gray-600 transition-all active:scale-90"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -111,22 +111,22 @@ const TagManager = ({ isOpen, onClose }) => {
         <div className="flex-1 overflow-y-auto p-6 space-y-8">
           {/* Add new tag */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-gray-700">Create New Tag</h3>
-            <div className="space-y-3">
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Create New Tag</h3>
+            <div className="space-y-4">
               <input
                 type="text"
                 value={newTagName}
                 onChange={(e) => setNewTagName(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
                 placeholder="Tag name (e.g. Engineering)"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm font-medium text-gray-800"
               />
               <div className="flex items-center justify-between gap-4">
                 <ColorSelector selectedColor={newTagColor} onChange={setNewTagColor} />
                 <button
                   onClick={handleAddTag}
                   disabled={!newTagName.trim()}
-                  className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold shadow-md hover:shadow-lg active:scale-95"
+                  className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold shadow-lg shadow-blue-200 active:scale-95"
                 >
                   Create
                 </button>
@@ -136,26 +136,26 @@ const TagManager = ({ isOpen, onClose }) => {
 
           {/* Existing tags */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-gray-700">Existing Tags</h3>
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Existing Tags</h3>
             <div className="space-y-3">
               {tags.length === 0 ? (
-                <div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-                  <p className="text-sm text-gray-500">No tags yet. Create your first one above!</p>
+                <div className="text-center py-10 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+                  <p className="text-sm text-gray-400 font-medium">No tags yet. Create your first one above!</p>
                 </div>
               ) : (
                 tags.map((tag) => (
                   <div
                     key={tag.id}
-                    className="group relative bg-white border border-gray-200 rounded-lg p-3 hover:border-blue-200 hover:shadow-md transition-all"
+                    className="group relative bg-white border border-gray-100 rounded-xl p-3.5 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-50/50 transition-all duration-300"
                   >
                     {editingId === tag.id ? (
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         <input
                           type="text"
                           value={editName}
                           onChange={(e) => setEditName(e.target.value)}
                           onKeyPress={(e) => e.key === 'Enter' && handleSaveEdit()}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                          className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-medium text-gray-800"
                           autoFocus
                         />
                         <div className="flex items-center justify-between">
@@ -163,7 +163,7 @@ const TagManager = ({ isOpen, onClose }) => {
                           <div className="flex gap-2">
                             <button
                               onClick={handleSaveEdit}
-                              className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                              className="p-2.5 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-all shadow-md active:scale-95"
                               title="Save"
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -172,7 +172,7 @@ const TagManager = ({ isOpen, onClose }) => {
                             </button>
                             <button
                               onClick={handleCancelEdit}
-                              className="p-2 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 transition-colors"
+                              className="p-2.5 bg-gray-100 text-gray-500 rounded-xl hover:bg-gray-200 transition-all active:scale-95"
                               title="Cancel"
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -183,19 +183,19 @@ const TagManager = ({ isOpen, onClose }) => {
                         </div>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-4">
                         <div
-                          className="w-10 h-10 rounded-lg shadow-inner border border-black/5 flex-shrink-0"
+                          className="w-12 h-12 rounded-xl shadow-inner border border-black/5 flex-shrink-0 transition-transform group-hover:scale-105"
                           style={{ backgroundColor: tag.color }}
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-gray-800 truncate">{tag.name}</p>
-                          <p className="text-[10px] text-gray-400 font-mono uppercase">{tag.color}</p>
+                          <p className="font-bold text-gray-900 truncate">{tag.name}</p>
+                          <p className="text-[10px] text-gray-400 font-mono uppercase tracking-wider">{tag.color}</p>
                         </div>
-                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
                           <button
                             onClick={() => handleStartEdit(tag)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
                             title="Edit tag"
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -204,7 +204,7 @@ const TagManager = ({ isOpen, onClose }) => {
                           </button>
                           <button
                             onClick={() => handleDelete(tag.id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-colors"
                             title="Delete tag"
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -222,10 +222,10 @@ const TagManager = ({ isOpen, onClose }) => {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-100 flex justify-end bg-gray-50/50">
+        <div className="px-6 py-5 border-t border-gray-100 flex justify-end bg-gray-50/50">
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-semibold shadow-sm active:scale-95"
+            className="px-8 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-all font-bold shadow-sm active:scale-95"
           >
             Done
           </button>

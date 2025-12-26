@@ -26,7 +26,7 @@ const Tooltip = ({ content, children, className = '' }) => {
       {children}
       {isVisible && createPortal(
         <div 
-          className="fixed px-3 py-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg whitespace-pre-line pointer-events-none w-max max-w-xs"
+          className="fixed px-3.5 py-2.5 bg-gray-900/95 backdrop-blur-md text-white text-[11px] font-bold rounded-xl shadow-2xl whitespace-pre-line pointer-events-none w-max max-w-xs border border-white/10"
           style={{
             top: `${position.top}px`,
             left: `${position.left}px`,
@@ -37,7 +37,7 @@ const Tooltip = ({ content, children, className = '' }) => {
           {content}
           {/* Arrow */}
           <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px]">
-            <div className="border-4 border-transparent border-t-gray-900"></div>
+            <div className="border-4 border-transparent border-t-gray-900/95"></div>
           </div>
         </div>,
         document.body

@@ -63,7 +63,7 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
       {/* File Operations */}
       <button
         onClick={handleOpen}
-        className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-100 transition-colors shadow-lg border border-gray-200"
+        className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 rounded-xl hover:bg-gray-50 transition-all shadow-xl border border-gray-200 active:scale-95"
         title="Open file (JSON)"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -74,7 +74,7 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
 
       <button
         onClick={handleSave}
-        className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-100 transition-colors shadow-lg border border-gray-200"
+        className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 rounded-xl hover:bg-gray-50 transition-all shadow-xl border border-gray-200 active:scale-95"
         title="Save to file (JSON)"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -83,16 +83,16 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
       </button>
 
       {/* Divider */}
-      <div className="w-px h-8 bg-gray-300" />
+      <div className="w-px h-8 bg-gray-300 mx-1" />
 
       {/* Undo/Redo */}
       <button
         onClick={() => undo()}
         disabled={!canUndo}
-        className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors shadow-lg border border-gray-200 ${
+        className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all shadow-xl border border-gray-200 active:scale-95 ${
           canUndo
-            ? 'bg-white text-gray-700 hover:bg-gray-100'
-            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+            ? 'bg-white text-gray-700 hover:bg-gray-50'
+            : 'bg-gray-50 text-gray-300 cursor-not-allowed'
         }`}
         title="Undo (Ctrl+Z)"
       >
@@ -104,10 +104,10 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
       <button
         onClick={() => redo()}
         disabled={!canRedo}
-        className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors shadow-lg border border-gray-200 ${
+        className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all shadow-xl border border-gray-200 active:scale-95 ${
           canRedo
-            ? 'bg-white text-gray-700 hover:bg-gray-100'
-            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+            ? 'bg-white text-gray-700 hover:bg-gray-50'
+            : 'bg-gray-50 text-gray-300 cursor-not-allowed'
         }`}
         title="Redo (Ctrl+Y)"
       >
@@ -117,12 +117,12 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
       </button>
 
       {/* Divider */}
-      <div className="w-px h-8 bg-gray-300" />
+      <div className="w-px h-8 bg-gray-300 mx-1" />
 
       {/* Add Task Button */}
       <button
         onClick={handleAddTask}
-        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg font-medium"
+        className="flex items-center gap-2 px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all shadow-xl font-bold active:scale-95"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
           <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
@@ -131,12 +131,12 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
       </button>
 
       {/* Divider */}
-      <div className="w-px h-8 bg-gray-300" />
+      <div className="w-px h-8 bg-gray-300 mx-1" />
 
       {/* Manage Tags Button */}
       <button
         onClick={() => setShowTagManager(true)}
-        className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-100 transition-colors shadow-lg border border-gray-200"
+        className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 rounded-xl hover:bg-gray-50 transition-all shadow-xl border border-gray-200 active:scale-95"
         title="Manage tags"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -147,7 +147,7 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
       {/* Reset Demo Button */}
       <button
         onClick={handleResetDemo}
-        className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-100 transition-colors shadow-lg border border-gray-200"
+        className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 rounded-xl hover:bg-gray-50 transition-all shadow-xl border border-gray-200 active:scale-95"
         title="Reset to demo"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -158,7 +158,7 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
       {/* Clear All Button */}
       <button
         onClick={handleClearAll}
-        className="flex items-center gap-2 px-3 py-2 bg-white text-red-600 rounded-lg hover:bg-red-50 transition-colors shadow-lg border border-gray-200"
+        className="flex items-center gap-2 px-3 py-2 bg-white text-red-600 rounded-xl hover:bg-red-50 transition-all shadow-xl border border-gray-200 active:scale-95"
         title="Clear all tasks"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -167,11 +167,11 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
       </button>
 
       {/* Divider */}
-      <div className="w-px h-8 bg-gray-300" />
+      <div className="w-px h-8 bg-gray-300 mx-1" />
 
       {/* Current File Name */}
       {currentFileName && (
-        <div className="px-3 py-2 bg-blue-50 rounded-lg shadow-lg border border-blue-200 text-sm text-blue-700">
+        <div className="px-4 py-2 bg-blue-50 rounded-xl shadow-xl border border-blue-200 text-sm font-bold text-blue-700 animate-in slide-in-from-top-2 duration-300">
           {currentFileName}
         </div>
       )}

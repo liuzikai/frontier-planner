@@ -95,13 +95,13 @@ const Sidebar = ({ onMinimize }) => {
   // Show welcome panel if no node is selected
   if (!selectedNode) {
     return (
-      <div className="w-80 h-screen bg-white border-l border-gray-200 shadow-lg flex flex-col">
+      <div className="w-80 h-screen bg-white border-l border-gray-200 shadow-2xl flex flex-col z-20">
         {/* Header with minimize button */}
-        <div className="px-4 py-3 border-b border-gray-200 flex justify-between items-center">
-          <h2 className="font-semibold text-gray-800">Task Dependency Graph</h2>
+        <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+          <h2 className="font-bold text-gray-900 tracking-tight">Task Graph</h2>
           <button
             onClick={onMinimize}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="p-1.5 rounded-full hover:bg-gray-200 text-gray-400 hover:text-gray-600 transition-all active:scale-90"
             title="Close panel"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -111,90 +111,77 @@ const Sidebar = ({ onMinimize }) => {
         </div>
         
         {/* Welcome content */}
-        <div className="flex-1 p-4 overflow-y-auto">
-          <div className="space-y-6">
-            {/* Getting Started */}
-            <div>
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">Getting Started</h3>
-              <ul className="space-y-1.5 text-sm text-gray-600">
-                <li>• Double-click canvas to add task</li>
-                <li>• Select node to edit and show <strong>task frontier</strong></li>
-                <li>• Drag to reposition</li>
-                <li>• Connect green and blue handles for dependencies</li>
-                <li>• Cmd/Ctrl+Click for multi-select</li>
-                <li>• Ctrl/⌘+Z undo, Ctrl/⌘+Shift+Z redo</li>
-              </ul>
+        <div className="flex-1 p-6 overflow-y-auto space-y-6">
+          {/* Getting Started */}
+          <div className="space-y-2.5">
+            <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Getting Started</h3>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li className="flex items-center gap-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                <span>Double-click canvas to add task</span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                <span>Select node to edit & show frontier</span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                <span>Drag to reposition nodes</span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                <span>Connect handles for dependencies</span>
+              </li>
+            </ul>
+          </div>
+          
+          {/* Features */}
+          <div className="space-y-2.5">
+            <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Features</h3>
+            <div className="space-y-2.5">
+              <div className="p-3 bg-orange-50 rounded-xl border border-orange-100">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="text-orange-500 font-bold">◉</span>
+                  <span className="text-sm font-bold text-orange-900">Frontier Nodes</span>
+                </div>
+                <p className="text-xs text-orange-800 leading-relaxed">Orange rings show next actionable tasks (all dependencies complete).</p>
+              </div>
+              <div className="p-3 bg-blue-50 rounded-xl border border-blue-100">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="text-blue-500 font-bold">⏱</span>
+                  <span className="text-sm font-bold text-blue-900">Time Estimation</span>
+                </div>
+                <p className="text-xs text-blue-800 leading-relaxed">Σ (sum) and ↓ (min) show time to reach selected task.</p>
+              </div>
             </div>
-            
-            {/* Features */}
-            <div>
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">Features</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li className="flex items-start gap-2">
-                  <span className="text-orange-500 font-bold mt-0.5">◉</span>
-                  <span><strong>Frontier Nodes:</strong> Orange rings show next actionable tasks (all dependencies complete)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-orange-500 font-bold mt-0.5">⏱</span>
-                  <span><strong>Time Estimation:</strong> Σ (sum) and ↓ (min) show time to reach selected task</span>
-                </li>
-              </ul>
-            </div>
-            
-            {/* Stats */}
-            <div>
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">Stats</h3>
-              <div className="space-y-2 text-sm text-gray-600">
-                {/* All nodes */}
-                <div className="flex justify-between">
-                  <span>All nodes</span>
-                  <span className="font-medium">{nodes.length}</span>
+          </div>
+          
+          {/* Stats */}
+          <div className="space-y-2.5">
+            <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Statistics</h3>
+            <div className="bg-gray-50 rounded-xl p-4 space-y-3 border border-gray-100">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Total Tasks</span>
+                <span className="text-sm font-bold text-gray-900">{nodes.length}</span>
+              </div>
+              <div className="h-px bg-gray-200"></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-gray-400 uppercase font-bold">Done</span>
+                  <span className="text-sm font-bold text-green-600">{nodes.filter(n => n.data.status === 'done').length}</span>
                 </div>
-                
-                {/* Spacer */}
-                <div className="h-1"></div>
-                
-                {/* By status */}
-                <div className="flex justify-between">
-                  <span>Done</span>
-                  <span className="font-medium">{nodes.filter(n => n.data.status === 'done').length}</span>
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-gray-400 uppercase font-bold">In Progress</span>
+                  <span className="text-sm font-bold text-blue-600">{nodes.filter(n => n.data.status === 'in-progress').length}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>In Progress</span>
-                  <span className="font-medium">{nodes.filter(n => n.data.status === 'in-progress').length}</span>
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-gray-400 uppercase font-bold">To Do</span>
+                  <span className="text-sm font-bold text-gray-600">{nodes.filter(n => n.data.status === 'todo').length}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>To Do</span>
-                  <span className="font-medium">{nodes.filter(n => n.data.status === 'todo').length}</span>
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-gray-400 uppercase font-bold">Someday</span>
+                  <span className="text-sm font-bold text-gray-400">{nodes.filter(n => n.data.status === 'someday').length}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Someday</span>
-                  <span className="font-medium">{nodes.filter(n => n.data.status === 'someday').length}</span>
-                </div>
-                
-                {/* By tags */}
-                {tags.filter(tag => nodes.some(n => n.data.primaryTag === tag.id)).length > 0 && (
-                  <>
-                    {/* Spacer */}
-                    <div className="h-1"></div>
-                    
-                    {tags
-                      .map(tag => ({
-                        tag,
-                        count: nodes.filter(n => n.data.primaryTag === tag.id).length,
-                      }))
-                      .filter(item => item.count > 0)
-                      .map(({ tag, count }) => (
-                        <div key={tag.id} className="flex justify-between items-center">
-                          <div className="flex items-center gap-1.5">
-                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: tag.color }}></div>
-                            <span>{tag.name}</span>
-                          </div>
-                          <span className="font-medium">{count}</span>
-                        </div>
-                      ))}
-                  </>
-                )}
               </div>
             </div>
           </div>
@@ -206,23 +193,25 @@ const Sidebar = ({ onMinimize }) => {
   // Show task details if node is selected and data exists
   if (!selectedNode || !selectedNodeData) {
     return (
-      <div className="w-80 bg-white border-l border-gray-200 p-6 flex flex-col items-center justify-center text-gray-400">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-        </svg>
-        <p className="text-center">Select a task to view and edit its details</p>
+      <div className="w-80 bg-white border-l border-gray-200 p-8 flex flex-col items-center justify-center text-gray-400 z-20">
+        <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6 border border-gray-100 shadow-inner">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+        </div>
+        <p className="text-center text-sm font-medium leading-relaxed">Select a task to view and edit its details</p>
       </div>
     );
   }
 
   return (
-    <div className="w-80 bg-white border-l border-gray-200 flex flex-col">
+    <div className="w-80 bg-white border-l border-gray-200 shadow-2xl flex flex-col z-20">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-        <h2 className="font-semibold text-gray-800">Task Details</h2>
+      <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+        <h2 className="font-bold text-gray-900 tracking-tight">Task Details</h2>
         <button
           onClick={handleClose}
-          className="text-gray-400 hover:text-gray-600 transition-colors"
+          className="p-1.5 rounded-full hover:bg-gray-200 text-gray-400 hover:text-gray-600 transition-all active:scale-90"
           title="Close (deselect)"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -232,10 +221,10 @@ const Sidebar = ({ onMinimize }) => {
       </div>
 
       {/* Form */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-6 space-y-5">
         {/* Title */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-1.5">
+          <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider">
             Title
           </label>
           <input
@@ -243,29 +232,29 @@ const Sidebar = ({ onMinimize }) => {
             name="title"
             value={formData.title}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+            className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm text-sm font-bold text-gray-800"
             placeholder="Enter task title..."
           />
         </div>
 
         {/* Description */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-1.5">
+          <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider">
             Description
           </label>
           <textarea
             name="description"
             value={formData.description}
             onChange={handleChange}
-            rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
+            rows={3}
+            className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none shadow-sm text-sm text-gray-600 leading-relaxed"
             placeholder="Enter task description..."
           />
         </div>
 
         {/* Status */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-1.5">
+          <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider">
             Status
           </label>
           <div className="grid grid-cols-2 gap-2">
@@ -279,10 +268,10 @@ const Sidebar = ({ onMinimize }) => {
                 key={status.value}
                 type="button"
                 onClick={() => handleStatusChange(status.value)}
-                className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
+                className={`px-3 py-2 text-sm font-bold rounded-xl border transition-all active:scale-95 ${
                   formData.status === status.value
-                    ? 'bg-blue-500 text-white border-blue-500'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-md'
+                    : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:border-gray-300'
                 }`}
               >
                 {status.label}
@@ -292,29 +281,35 @@ const Sidebar = ({ onMinimize }) => {
         </div>
 
         {/* Primary Tag */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-1.5">
+          <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider">
             Primary Tag
           </label>
-          <select
-            name="primaryTag"
-            value={formData.primaryTag || ''}
-            onChange={handleTagChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg%20xmlns%3d%22http%3a%2f%2fwww.w3.org%2f2000%2fsvg%22%20viewBox%3d%220%200%2020%2020%22%20fill%3d%22none%22%3e%3cpath%20d%3d%22M7%207l3-3%203%203m0%206l-3%203-3-3%22%20stroke%3d%22%239ca3af%22%20stroke-width%3d%221.5%22%20stroke-linecap%3d%22round%22%20stroke-linejoin%3d%22round%22%2f%3e%3c%2fsvg%3e')] bg-[length:1.5em] bg-[right_0.5rem_center] bg-no-repeat pr-10"
-            style={{ WebkitAppearance: 'none', MozAppearance: 'none' }}
-          >
-            <option value="">No Tag</option>
-            {tags.map((tag) => (
-              <option key={tag.id} value={tag.id}>
-                {tag.name}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              name="primaryTag"
+              value={formData.primaryTag || ''}
+              onChange={handleTagChange}
+              className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white cursor-pointer appearance-none shadow-sm text-sm font-bold text-gray-800"
+            >
+              <option value="">No Tag</option>
+              {tags.map((tag) => (
+                <option key={tag.id} value={tag.id}>
+                  {tag.name}
+                </option>
+              ))}
+            </select>
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </div>
+          </div>
         </div>
 
         {/* Estimated Time */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-1.5">
+          <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider">
             Estimated Time
           </label>
           <div className="flex gap-2">
@@ -326,22 +321,22 @@ const Sidebar = ({ onMinimize }) => {
               onChange={handleChange}
               step="0.5"
               min="0"
-              className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              className="w-24 px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm text-sm font-bold text-gray-800"
               placeholder="0"
             />
             
             {/* Unit Selection */}
-            <div className="flex flex-1 border border-gray-300 rounded-lg overflow-hidden">
+            <div className="flex flex-1 bg-gray-50 p-1 rounded-xl border border-gray-200 shadow-inner">
               {['days', 'weeks', 'months'].map((unit) => (
                 <button
                   key={unit}
                   type="button"
                   onClick={() => handleTimeUnitChange(unit)}
-                  className={`px-3 py-2 text-sm transition-colors ${
+                  className={`flex-1 py-1.5 text-[11px] font-bold uppercase tracking-tight rounded-xl transition-all active:scale-95 ${
                     formData.estimatedTimeUnit === unit
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-50'
-                  } ${unit !== 'days' ? 'border-l border-gray-300' : ''}`}
+                      ? 'bg-white text-blue-600 shadow-sm border border-blue-100'
+                      : 'text-gray-400 hover:text-gray-600'
+                  }`}
                 >
                   {unit}
                 </button>
@@ -351,24 +346,27 @@ const Sidebar = ({ onMinimize }) => {
         </div>
 
         {/* Note */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Note
+        <div className="space-y-1.5">
+          <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+            Private Notes
           </label>
           <textarea
             name="note"
             value={formData.note}
             onChange={handleChange}
-            rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
+            rows={3}
+            className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none shadow-sm text-sm text-gray-600 leading-relaxed italic"
             placeholder="Add private notes..."
           />
         </div>
       </div>
 
       {/* Footer with creation date */}
-      <div className="px-4 py-3 border-t border-gray-200 text-xs text-gray-400">
-        Created: {new Date(selectedNodeData.data.createdAt).toLocaleDateString()}
+      <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/30">
+        <div className="flex items-center justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+          <span>Created</span>
+          <span>{new Date(selectedNodeData.data.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+        </div>
       </div>
     </div>
   );

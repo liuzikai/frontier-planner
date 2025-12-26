@@ -37,56 +37,56 @@ const TaskNode = ({ id, data, selected }) => {
     <div className={`relative group ${nodeOpacity}`}>
       <div
         className={`
-          min-w-[200px] max-w-[280px] rounded-lg shadow-lg border-2 transition-all duration-200
+          min-w-[180px] max-w-[240px] rounded-xl shadow-xl border-2 transition-all duration-300
           ${statusColors[data.status]}
-          ${selected ? 'ring-2 ring-purple-500 ring-offset-2 scale-105' : 'hover:shadow-xl'}
-          ${data.isFrontier ? 'ring-4 ring-orange-500 ring-offset-2 shadow-orange-500/50' : ''}
+          ${selected ? 'ring-2 ring-purple-500 ring-offset-4 scale-105 shadow-2xl' : 'hover:shadow-2xl hover:-translate-y-1'}
+          ${data.isFrontier ? 'ring-4 ring-orange-500 ring-offset-2 shadow-orange-500/30' : ''}
         `}
       >
         {/* Input Handle (left side) */}
         <Handle
           type="target"
           position={Position.Left}
-          className="!w-3 !h-3 !bg-blue-500 !border-2 !border-white"
+          className="!w-3.5 !h-3.5 !bg-blue-500 !border-2 !border-white !shadow-md hover:!scale-125 transition-transform"
         />
 
         {/* Header */}
-        <div className={`px-3 py-2 ${data.description ? 'border-b border-inherit' : ''} relative`}>
+        <div className={`px-3 py-2.5 ${data.description ? 'border-b border-inherit' : ''} relative`}>
           {/* Delete button - Absolutely positioned */}
           <button
             onClick={handleDelete}
-            className="absolute top-1.5 right-1.5 text-gray-400 hover:text-red-500 transition-colors p-0.5"
+            className="absolute top-1.5 right-1.5 text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-50 opacity-0 group-hover:opacity-100"
             title="Delete task"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
           </button>
 
           {/* Content with right padding to avoid delete button overlap */}
-          <div className="pr-8">
-            <div className="flex flex-wrap gap-1 mb-1">
+          <div className="pr-5">
+            <div className="flex flex-wrap gap-1 mb-1.5">
               {primaryTag && (
                 <span
-                  className="inline-block text-[10px] px-1.5 py-0.5 rounded font-medium text-gray-800 border"
+                  className="inline-block text-[9px] px-1.5 py-0.5 rounded-full font-bold text-gray-800 border shadow-sm"
                   style={{ 
-                    backgroundColor: `${primaryTag.color}30`,
-                    borderColor: `${primaryTag.color}70`,
+                    backgroundColor: `${primaryTag.color}20`,
+                    borderColor: `${primaryTag.color}50`,
                   }}
                 >
                   {primaryTag.name}
                 </span>
               )}
-              <span className="inline-block text-[10px] px-1.5 py-0.5 rounded font-medium bg-gray-100 text-gray-600">
+              <span className="inline-block text-[9px] px-1.5 py-0.5 rounded-full font-bold bg-white/50 text-gray-600 border border-gray-200 shadow-sm">
                 {statusLabels[data.status]}
               </span>
               {data.estimatedTime && (
-                <span className="inline-block text-[10px] px-1.5 py-0.5 rounded font-medium bg-gray-100 text-gray-600">
-                  ⏱ {data.estimatedTime} {parseFloat(data.estimatedTime) === 1 ? (data.estimatedTimeUnit || 'days').replace(/s$/, '') : (data.estimatedTimeUnit || 'days')}
+                <span className="inline-block text-[9px] px-1.5 py-0.5 rounded-full font-bold bg-white/50 text-gray-600 border border-gray-200 shadow-sm">
+                  ⏱ {data.estimatedTime} {(data.estimatedTimeUnit || 'days').charAt(0)}
                 </span>
               )}
             </div>
-            <h3 className="font-semibold text-sm leading-tight break-words inline">
+            <h3 className="font-bold text-[13px] leading-tight break-words text-gray-800 line-clamp-2">
               {data.title || 'Untitled Task'}
               {data.note && (
                 <span className="text-gray-400 ml-1 inline-block" style={{ verticalAlign: '0.05em' }} title="Has note">
@@ -102,7 +102,7 @@ const TaskNode = ({ id, data, selected }) => {
         {/* Body */}
         <div className="px-3 py-2">
           {data.description && (
-            <p className="text-xs text-gray-600 line-clamp-2">
+            <p className="text-[11px] text-gray-600 leading-relaxed line-clamp-2">
               {data.description}
             </p>
           )}
@@ -112,7 +112,7 @@ const TaskNode = ({ id, data, selected }) => {
         <Handle
           type="source"
           position={Position.Right}
-          className="!w-3 !h-3 !bg-green-500 !border-2 !border-white"
+          className="!w-3.5 !h-3.5 !bg-green-500 !border-2 !border-white !shadow-md hover:!scale-125 transition-transform"
         />
         
         {/* Cumulative Time Display - on top of node, right side */}
@@ -123,22 +123,22 @@ const TaskNode = ({ id, data, selected }) => {
               : "Σ = Sum (serial execution), total time if all tasks are done one after another\n↓ = Min (parallel execution), minimum time with maximum parallelism\n\n1 week = 5 days\n1 month = 4 weeks"
             }
             className={`absolute right-0 z-50 ${
-              data.cumulativeTime.sum === data.cumulativeTime.min ? '-top-8' : '-top-12'
+              data.cumulativeTime.sum === data.cumulativeTime.min ? '-top-10' : '-top-14'
             }`}
           >
-            <div className="bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded shadow-lg cursor-help">
+            <div className="bg-orange-500 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-xl shadow-xl cursor-help animate-in fade-in zoom-in duration-200">
               {data.cumulativeTime.sum === data.cumulativeTime.min ? (
                 // Single time (frontier or equal)
                 <div>{formatTime(data.cumulativeTime.sum)}</div>
               ) : (
                 // Two times (sum and min)
                 <div className="text-left leading-tight">
-                  <div className="flex items-center gap-1">
-                    <span className="opacity-70">Σ</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="opacity-70 font-mono">Σ</span>
                     <span>{formatTime(data.cumulativeTime.sum)}</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <span className="opacity-70">↓</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="opacity-70 font-mono">↓</span>
                     <span>{formatTime(data.cumulativeTime.min)}</span>
                   </div>
                 </div>
@@ -151,9 +151,9 @@ const TaskNode = ({ id, data, selected }) => {
         {data.isFrontier && !data.estimatedTime && (
           <Tooltip
             content="Frontier node: Ready to start (all dependencies complete) but missing estimated time"
-            className="absolute -top-8 right-0 z-50"
+            className="absolute -top-10 right-0 z-50"
           >
-            <div className="bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded shadow-lg cursor-help">
+            <div className="bg-orange-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl shadow-xl cursor-help animate-in fade-in zoom-in duration-200">
               ?
             </div>
           </Tooltip>

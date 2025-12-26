@@ -255,11 +255,11 @@ const Canvas = () => {
             size={1}
             color="#e5e7eb"
           />
-          <Controls className="!bg-white !rounded-lg !shadow-lg !border !border-gray-200">
+          <Controls className="!bg-white !rounded-xl !shadow-xl !border !border-gray-100 !overflow-hidden">
             <ControlButton
               onClick={() => setShowMiniMap(!showMiniMap)}
               title={showMiniMap ? 'Hide minimap' : 'Show minimap'}
-              className={showMiniMap ? '!bg-blue-50 !text-blue-700' : ''}
+              className={showMiniMap ? '!bg-blue-50 !text-blue-600' : ''}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293zM17.707 5.293L14 1.586v12.828l2.293 2.293A1 1 0 0018 16V6a1 1 0 00-.293-.707z" clipRule="evenodd" />
@@ -286,9 +286,9 @@ const Canvas = () => {
                 return 'transparent';
               }}
               nodeStrokeWidth={(node) => (node.selected || node.data?.isFrontier ? 4 : 0)}
-              maskColor="rgba(0, 0, 0, 0.1)"
-              className="!bg-white !rounded-lg !shadow-lg !border !border-gray-200 !left-10 animate-in fade-in slide-in-from-left-5 duration-300"
-              style={{ width: 180, height: 130 }}
+              maskColor="rgba(243, 244, 246, 0.6)"
+              className="!bg-white/80 !backdrop-blur-md !rounded-2xl !shadow-2xl !border !border-gray-100 !left-10 animate-in fade-in slide-in-from-left-5 duration-500"
+              style={{ width: 200, height: 140 }}
               position="bottom-left"
             />
           )}
