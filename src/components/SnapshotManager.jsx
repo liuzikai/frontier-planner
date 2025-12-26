@@ -32,7 +32,7 @@ const SnapshotManager = ({ isOpen, onClose }) => {
               value={newSnapshotName}
               onChange={(e) => setNewSnapshotName(e.target.value)}
               placeholder="Snapshot name (optional)"
-              className="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all dark:text-gray-100"
+              className="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all dark:text-gray-100"
             />
             <button
               type="submit"
@@ -51,7 +51,7 @@ const SnapshotManager = ({ isOpen, onClose }) => {
               snapshots.map((snapshot) => (
                 <div
                   key={snapshot.id}
-                  className="group flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-blue-100 dark:hover:border-blue-800 transition-all"
+                  className="group flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-blue-100 dark:hover:border-blue-800 transition-all"
                 >
                   <div className="flex-1 min-w-0 mr-4">
                     <div className="text-sm font-bold text-gray-800 dark:text-gray-200 truncate">

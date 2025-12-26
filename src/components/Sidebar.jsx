@@ -108,7 +108,7 @@ const Sidebar = ({ onMinimize }) => {
   // Show welcome panel if no node is selected
   if (!selectedNode) {
     return (
-      <div className="w-80 h-screen bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col z-20">
+      <div className="w-80 h-screen bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-2xl flex flex-col z-20">
         {/* Header with minimize button */}
         <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
           <h2 className="font-bold text-gray-900 dark:text-gray-100 tracking-tight">Frontier Planner</h2>
@@ -206,7 +206,7 @@ const Sidebar = ({ onMinimize }) => {
   // Show task details if node is selected and data exists
   if (!selectedNode || !selectedNodeData) {
     return (
-      <div className="w-80 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 p-8 flex flex-col items-center justify-center text-gray-400 z-20">
+      <div className="w-80 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 p-8 flex flex-col items-center justify-center text-gray-400 z-20">
         <div className="w-20 h-20 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6 border border-gray-100 dark:border-gray-700 shadow-inner">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-300 dark:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -218,7 +218,7 @@ const Sidebar = ({ onMinimize }) => {
   }
 
   return (
-    <div className="w-80 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col z-20">
+    <div className="w-80 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-2xl flex flex-col z-20">
       {/* Header */}
       <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
         <h2 className="font-bold text-gray-900 dark:text-gray-100 tracking-tight">Task Details</h2>
@@ -246,7 +246,7 @@ const Sidebar = ({ onMinimize }) => {
             value={formData.title}
             onChange={handleChange}
             rows={1}
-            className="w-full px-4 py-2 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm text-sm font-bold text-gray-800 dark:text-gray-100 resize-none overflow-hidden leading-relaxed"
+            className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm text-sm font-bold text-gray-800 dark:text-gray-100 resize-none overflow-hidden leading-relaxed"
             placeholder="Enter task title..."
           />
         </div>
@@ -261,7 +261,7 @@ const Sidebar = ({ onMinimize }) => {
             value={formData.description}
             onChange={handleChange}
             rows={3}
-            className="w-full px-4 py-2 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none shadow-sm text-sm text-gray-600 dark:text-gray-400 leading-relaxed"
+            className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none shadow-sm text-sm text-gray-600 dark:text-gray-400 leading-relaxed"
             placeholder="Enter task description..."
           />
         </div>
@@ -285,7 +285,7 @@ const Sidebar = ({ onMinimize }) => {
                 className={`px-3 py-2 text-sm font-bold rounded-xl border transition-all active:scale-95 ${
                   formData.status === status.value
                     ? 'bg-blue-600 text-white border-blue-600 shadow-md'
-                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-700'
+                    : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-gray-300 dark:hover:border-gray-600'
                 }`}
               >
                 {status.label}
@@ -304,7 +304,7 @@ const Sidebar = ({ onMinimize }) => {
               name="primaryTag"
               value={formData.primaryTag || ''}
               onChange={handleTagChange}
-              className="w-full px-4 py-2 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none cursor-pointer appearance-none shadow-sm text-sm font-bold text-gray-800 dark:text-gray-100"
+              className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none cursor-pointer appearance-none shadow-sm text-sm font-bold text-gray-800 dark:text-gray-100"
             >
               <option value="">No Tag</option>
               {tags.map((tag) => (
@@ -335,12 +335,12 @@ const Sidebar = ({ onMinimize }) => {
               onChange={handleChange}
               step="0.5"
               min="0"
-              className="w-24 px-4 py-2 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm text-sm font-bold text-gray-800 dark:text-gray-100"
+              className="w-24 px-4 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm text-sm font-bold text-gray-800 dark:text-gray-100"
               placeholder="0"
             />
             
             {/* Unit Selection */}
-            <div className="flex flex-1 bg-gray-50 dark:bg-gray-800 p-1 rounded-xl border border-gray-200 dark:border-gray-800 shadow-inner">
+            <div className="flex flex-1 bg-gray-50 dark:bg-gray-700 p-1 rounded-xl border border-gray-200 dark:border-gray-700 shadow-inner">
               {['days', 'weeks', 'months'].map((unit) => (
                 <button
                   key={unit}
@@ -348,7 +348,7 @@ const Sidebar = ({ onMinimize }) => {
                   onClick={() => handleTimeUnitChange(unit)}
                   className={`flex-1 py-1.5 text-[11px] font-bold uppercase tracking-tight rounded-xl transition-all active:scale-95 ${
                     formData.estimatedTimeUnit === unit
-                      ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm border border-blue-100 dark:border-blue-900/50'
+                      ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-300 shadow-sm border border-blue-100 dark:border-blue-900/50'
                       : 'text-gray-400 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400'
                   }`}
                 >
@@ -369,7 +369,7 @@ const Sidebar = ({ onMinimize }) => {
             value={formData.note}
             onChange={handleChange}
             rows={3}
-            className="w-full px-4 py-2 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none shadow-sm text-sm text-gray-600 dark:text-gray-400 leading-relaxed"
+            className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none shadow-sm text-sm text-gray-600 dark:text-gray-400 leading-relaxed"
             placeholder="Add private notes..."
           />
         </div>

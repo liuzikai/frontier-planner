@@ -155,7 +155,7 @@ const TagManager = ({ isOpen, onClose }) => {
                           value={editName}
                           onChange={(e) => setEditName(e.target.value)}
                           onKeyPress={(e) => e.key === 'Enter' && handleSaveEdit()}
-                          className="w-full px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-medium text-gray-800 dark:text-gray-100"
+                          className="w-full px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-medium text-gray-800 dark:text-gray-100"
                           autoFocus
                         />
                         <div className="flex items-center justify-between">
@@ -222,10 +222,10 @@ const TagManager = ({ isOpen, onClose }) => {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-5 border-t border-gray-100 dark:border-gray-800 flex justify-end bg-gray-50/50 dark:bg-gray-900/50">
+        <div className="px-6 py-5 border-t border-gray-100 dark:border-gray-700 flex justify-end bg-gray-50/50 dark:bg-gray-800/50">
           <button
             onClick={onClose}
-            className="px-8 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all font-bold shadow-sm active:scale-95"
+            className="px-8 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-600 transition-all font-bold shadow-sm active:scale-95"
           >
             Done
           </button>
