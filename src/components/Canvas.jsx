@@ -45,10 +45,13 @@ const Canvas = () => {
     onNodeDragStop,
     saveToFile,
     loadFromFile,
+    lastLoadedAt,
+    isDirty,
   } = useStore();
 
   const undo = useTemporalStore((state) => state.undo);
   const redo = useTemporalStore((state) => state.redo);
+  const clearHistory = useTemporalStore((state) => state.clear);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -61,6 +64,9 @@ const Canvas = () => {
       // Open: Ctrl+O or Cmd+O
       if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
         e.preventDefault();
+        if (isDirty && !window.confirm('You have unsaved changes. Open another file anyway?')) {
+          return;
+        }
         loadFromFile();
       }
       // Undo: Ctrl+Z or Cmd+Z
@@ -86,6 +92,19 @@ const Canvas = () => {
   
   // Get React Flow instance to access viewport
   const reactFlowInstance = useReactFlow();
+
+  // Recenter graph when a new file is loaded or project is reset
+  useEffect(() => {
+    if (lastLoadedAt && reactFlowInstance) {
+      // Clear undo/redo history for the new file
+      clearHistory();
+      
+      // Small timeout to ensure React Flow has rendered the new nodes
+      setTimeout(() => {
+        reactFlowInstance.fitView({ padding: 0.2, duration: 800 });
+      }, 50);
+    }
+  }, [lastLoadedAt, reactFlowInstance, clearHistory]);
 
   // MiniMap visibility state
   const [showMiniMap, setShowMiniMap] = useState(true);

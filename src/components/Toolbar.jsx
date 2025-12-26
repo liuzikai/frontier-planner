@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { useTemporalStore } from '../store/useStore';
 import TagManager from './TagManager';
-import SnapshotManager from './SnapshotManager';
 
 const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
   const { 
@@ -18,7 +17,6 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
     tags 
   } = useStore();
   const [showTagManager, setShowTagManager] = useState(false);
-  const [showSnapshotManager, setShowSnapshotManager] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [downloadFileName, setDownloadFileName] = useState('');
   
@@ -64,6 +62,9 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
   };
 
   const handleOpen = async () => {
+    if (isDirty && !window.confirm('You have unsaved changes. Open another file anyway?')) {
+      return;
+    }
     const result = await loadFromFile();
     if (result && !result.success && result.error !== 'Cancelled') {
       alert(`Failed to open file: ${result.error}`);
@@ -229,17 +230,6 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
         </svg>
       </button>
 
-      {/* Snapshots Button */}
-      <button
-        onClick={() => setShowSnapshotManager(true)}
-        className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 rounded-xl hover:bg-gray-50 transition-all shadow-xl border border-gray-200 active:scale-95"
-        title="Version Snapshots"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
-        </svg>
-      </button>
-
       {/* Divider */}
       <div className="w-px h-8 bg-gray-300 mx-1" />
 
@@ -257,9 +247,6 @@ const Toolbar = ({ getViewportCenter, showMiniMap, setShowMiniMap }) => {
 
       {/* Tag Manager Modal */}
       <TagManager isOpen={showTagManager} onClose={() => setShowTagManager(false)} />
-
-      {/* Snapshot Manager Modal */}
-      <SnapshotManager isOpen={showSnapshotManager} onClose={() => setShowSnapshotManager(false)} />
 
       {/* Download Filename Modal (Safari/Legacy) */}
       {showDownloadModal && (

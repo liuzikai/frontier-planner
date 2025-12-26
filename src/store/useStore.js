@@ -244,6 +244,7 @@ export const useStore = create(
         currentFileName: 'Untitled.json',
         fileHandle: null, // Not persisted
         isDirty: true,
+        lastLoadedAt: null,
         lastSavedAt: null,
         snapshots: [], // Persisted versions
         isNativeFileSystemSupported: 'showSaveFilePicker' in window && window.isSecureContext,
@@ -273,6 +274,7 @@ export const useStore = create(
             edges: snapshot.data.edges,
             tags: snapshot.data.tags || get().tags,
             isDirty: true,
+            lastLoadedAt: Date.now(),
           });
         },
         onNodesChange: (changes) => {
@@ -430,6 +432,7 @@ export const useStore = create(
             fileHandle: null,
             currentFileName: 'Untitled.json',
             isDirty: true,
+            lastLoadedAt: Date.now(),
           });
         },
 
@@ -449,6 +452,7 @@ export const useStore = create(
               selectedNode: null,
               selectedNodes: [],
               isDirty: false,
+              lastLoadedAt: Date.now(),
             });
             return { success: true };
           } catch (e) {
@@ -539,6 +543,7 @@ export const useStore = create(
         edges: state.edges,
         tags: state.tags,
         currentFileName: state.currentFileName,
+        isDirty: state.isDirty,
         snapshots: state.snapshots,
       }),
     }

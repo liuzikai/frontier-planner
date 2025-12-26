@@ -44,12 +44,32 @@ When you select a task, the app calculates how long it will take to reach it fro
   - Hover over badges for detailed explanations
 
 ### UI/UX Features
-- **Undo/Redo**: Full history support with Ctrl/⌘+Z and Ctrl/⌘+Shift+Z
-- **File Management**: Save and load projects as JSON files
-- **Tag Manager**: Create, edit, and delete custom tags with colors
-- **MiniMap**: Toggle minimap for better navigation
-- **Statistics**: View task count by status in real-time
-- **Tips**: Hover over the "?" button for keyboard shortcuts and usage tips
+- **High-Density SaaS UI**: Professional, compact interface designed for productivity.
+- **"Silver Bullet" File Management**:
+  - **Native File System Access**: Direct "Save" (Ctrl+S) support in Chromium browsers (Chrome, Edge) for in-place file editing.
+  - **Cross-Browser Fallback**: Intelligent download-based saving for Safari and Firefox with custom filename control.
+  - **Unsaved Changes Tracking**: Visual indicators (orange/blue filename) and confirmation prompts to prevent data loss.
+  - **Auto-Recentering**: The graph automatically fits to view when loading or creating projects.
+- **Comprehensive Demo**: "New Project" initializes with a rich example showcasing dependency chains, parallel time calculations, and status types.
+- **Undo/Redo**: Full history support with Ctrl/⌘+Z and Ctrl/⌘+Shift+Z.
+- **Tag Manager**: Create, edit, and delete custom tags with colors.
+- **MiniMap & Statistics**: Toggleable minimap and real-time task count by status.
+- **Tips**: Hover over the "?" button for keyboard shortcuts and usage tips.
+
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+| :--- | :--- |
+| **Ctrl/⌘ + S** | Save Project (In-place if supported) |
+| **Ctrl/⌘ + O** | Open Project |
+| **Ctrl/⌘ + N** | New Project (with Demo) |
+| **Ctrl/⌘ + Z** | Undo |
+| **Ctrl/⌘ + Shift + Z** / **Ctrl/⌘ + Y** | Redo |
+| **Ctrl/⌘ + A** | Select All Nodes |
+| **Backspace / Delete** | Delete Selected Nodes/Edges |
+| **Double Click** | Create New Task |
+| **Space + Drag** | Pan Canvas |
+| **Scroll / Pinch** | Zoom In/Out |
 
 ## Technical Stack
 
@@ -58,26 +78,27 @@ When you select a task, the app calculates how long it will take to reach it fro
 - **React Flow (@xyflow/react)**: Canvas and graph visualization
 - **Zustand**: State management
   - `zundo`: Temporal state management for undo/redo
-  - `persist`: LocalStorage persistence
-- **Tailwind CSS v4**: Styling
+  - `persist`: LocalStorage persistence for session recovery
+- **Tailwind CSS v4**: Modern utility-first styling
+- **File System Access API**: Native browser integration for local file management
 
 ## Project Structure
 
 ```
 src/
 ├── components/
-│   ├── Canvas.jsx         # Main canvas with React Flow
-│   ├── TaskNode.jsx       # Custom node component
-│   ├── Sidebar.jsx        # Task detail editor
-│   ├── Toolbar.jsx        # Top toolbar with actions
-│   ├── Tooltip.jsx        # Custom tooltip component
-│   └── TagManager.jsx     # Tag management modal
+│   ├── Canvas.jsx         # Main canvas, shortcuts, and graph logic
+│   ├── TaskNode.jsx       # Custom node with status and time badges
+│   ├── Sidebar.jsx        # Task detail editor and metadata
+│   ├── Toolbar.jsx        # File actions, stats, and global controls
+│   ├── TagManager.jsx     # Tag management modal
+│   └── Tooltip.jsx        # Custom tooltip component
 ├── store/
-│   └── useStore.js        # Zustand store with temporal & persist
+│   └── useStore.js        # Central state, demo data, and file handlers
 ├── utils/
 │   ├── frontierUtils.js   # Frontier node detection algorithm
-│   └── timeUtils.js       # Time calculation and formatting
-└── index.css              # Tailwind styles
+│   └── timeUtils.js       # Parallel time calculation logic
+└── index.css              # Tailwind styles and custom animations
 ```
 
 ## Key Algorithms
@@ -114,13 +135,13 @@ npm run preview
 
 ## Usage Tips
 
-1. **Creating Tasks**: Double-click the canvas to add a new task
-2. **Connecting Tasks**: Drag from a green output handle to a blue input handle
-3. **Editing Tasks**: Click a task to open the sidebar editor
-4. **Finding Next Actions**: Select a milestone/goal task to see which tasks you can start now (frontier nodes with orange rings)
-5. **Estimating Time**: Add time estimates to tasks, then select a goal to see how long it will take
-6. **Organizing**: Use tags and the someday status to manage priorities
-
-## License
-
-MIT
+1. **Creating Tasks**: Double-click the canvas to add a new task.
+2. **Connecting Tasks**: Drag from a green output handle to a blue input handle.
+3. **Editing Tasks**: Click a task to open the sidebar editor.
+4. **Finding Next Actions**: Select a milestone/goal task to see which tasks you can start now (frontier nodes with orange rings).
+5. **Estimating Time**: Add time estimates to tasks, then select a goal to see how long it will take.
+6. **File Management**:
+   - Use **Ctrl+S** to save your work. In Chrome/Edge, this saves directly to the file you opened.
+   - The filename in the toolbar turns **orange** when you have unsaved changes.
+   - "New Project" will load a demo graph to help you get started.
+7. **Organizing**: Use tags and the "Someday" status to manage priorities without cluttering your active timeline.
