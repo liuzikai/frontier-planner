@@ -1,5 +1,7 @@
 # Frontier Planner
 
+![Frontier Planner Screenshot](screenshot.jpg)
+
 A visual task management tool built with React and React Flow that helps you organize tasks with dependencies, track progress, and estimate time to completion.
 
 ## Features
