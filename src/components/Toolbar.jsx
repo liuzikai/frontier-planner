@@ -44,31 +44,34 @@ const Toolbar = ({ getViewportCenter }) => {
     }
   };
 
-  const handleConfirmDownload = async (e) => {
+  const handleConfirmDownload = (e) => {
     e.preventDefault();
-    const result = await saveAs(downloadFileName);
-    if (result && result.success) {
-      setShowDownloadModal(false);
-    } else if (result && result.error !== 'Cancelled') {
-      alert(`Failed to download: ${result.error}`);
-    }
+    saveAs(downloadFileName).then(result => {
+      if (result && result.success) {
+        setShowDownloadModal(false);
+      } else if (result && result.error !== 'Cancelled') {
+        alert(`Failed to download: ${result.error}`);
+      }
+    });
   };
 
-  const handleSaveAs = async () => {
-    const result = await saveAs();
-    if (result && !result.success && result.error !== 'Cancelled') {
-      alert(`Failed to save: ${result.error}`);
-    }
+  const handleSaveAs = () => {
+    saveAs().then(result => {
+      if (result && !result.success && result.error !== 'Cancelled') {
+        alert(`Failed to save: ${result.error}`);
+      }
+    });
   };
 
-  const handleOpen = async () => {
+  const handleOpen = () => {
     if (isDirty && !window.confirm('You have unsaved changes. Open another file anyway?')) {
       return;
     }
-    const result = await loadFromFile();
-    if (result && !result.success && result.error !== 'Cancelled') {
-      alert(`Failed to open file: ${result.error}`);
-    }
+    loadFromFile().then(result => {
+      if (result && !result.success && result.error !== 'Cancelled') {
+        alert(`Failed to open file: ${result.error}`);
+      }
+    });
   };
 
   const handleNew = () => {

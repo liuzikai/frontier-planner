@@ -243,7 +243,7 @@ export const useStore = create(
         selectedNodes: [],
         currentFileName: 'Untitled.json',
         fileHandle: null, // Not persisted
-        isDirty: true,
+        isDirty: false,
         lastLoadedAt: null,
         lastSavedAt: null,
         snapshots: [], // Persisted versions
@@ -434,7 +434,7 @@ export const useStore = create(
             selectedNodes: [],
             fileHandle: null,
             currentFileName: 'Untitled.json',
-            isDirty: true,
+            isDirty: false,
             lastLoadedAt: Date.now(),
           });
         },
@@ -463,32 +463,59 @@ export const useStore = create(
           }
         },
 
-        loadFromFile: async () => {
-          try {
-            if ('showOpenFilePicker' in window) {
-              const handle = await getFileHandle();
-              if (!handle) return { success: false, error: 'Cancelled' };
-              const file = await handle.getFile();
-              const result = get().importFromJSON(await file.text());
-              if (result.success) set({ fileHandle: handle, currentFileName: file.name });
-              return result;
-            } else {
-              return new Promise((resolve) => {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = '.json';
-                input.onchange = async (e) => {
-                  const file = e.target.files[0];
-                  if (!file) return resolve({ success: false, error: 'No file' });
+        loadFromFile: () => {
+          if ('showOpenFilePicker' in window) {
+            return (async () => {
+              try {
+                const handle = await getFileHandle();
+                if (!handle) return { success: false, error: 'Cancelled' };
+                const file = await handle.getFile();
+                const result = get().importFromJSON(await file.text());
+                if (result.success) set({ fileHandle: handle, currentFileName: file.name });
+                return result;
+              } catch (e) {
+                return { success: false, error: e.message };
+              }
+            })();
+          } else {
+            return new Promise((resolve) => {
+              const input = document.createElement('input');
+              input.type = 'file';
+              input.accept = '.json';
+              input.style.display = 'none';
+              document.body.appendChild(input);
+
+              input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) {
+                  document.body.removeChild(input);
+                  return resolve({ success: false, error: 'No file' });
+                }
+                try {
                   const result = get().importFromJSON(await file.text());
                   if (result.success) set({ currentFileName: file.name });
+                  document.body.removeChild(input);
                   resolve(result);
-                };
-                input.click();
-              });
-            }
-          } catch (e) {
-            return { success: false, error: e.message };
+                } catch (err) {
+                  document.body.removeChild(input);
+                  resolve({ success: false, error: err.message });
+                }
+              };
+
+              // Cleanup if user cancels
+              const handleFocus = () => {
+                setTimeout(() => {
+                  if (document.body.contains(input)) {
+                    document.body.removeChild(input);
+                    // We don't resolve as cancelled here because onchange might still fire
+                  }
+                  window.removeEventListener('focus', handleFocus);
+                }, 1000);
+              };
+              window.addEventListener('focus', handleFocus);
+
+              input.click();
+            });
           }
         },
 
@@ -506,31 +533,38 @@ export const useStore = create(
           return get().saveAs();
         },
 
-        saveAs: async (suggestedName) => {
+        saveAs: (suggestedName) => {
           const { exportToJSON, currentFileName } = get();
           const nameToUse = suggestedName || currentFileName || 'project.json';
           
           if ('showSaveFilePicker' in window) {
-            try {
-              const handle = await getNewFileHandle(nameToUse);
-              if (!handle) return { success: false, error: 'Cancelled' };
-              await writeFile(handle, exportToJSON());
-              const file = await handle.getFile();
-              set({ fileHandle: handle, currentFileName: file.name, isDirty: false, lastSavedAt: new Date().toISOString() });
-              return { success: true };
-            } catch (e) {
-              return { success: false, error: e.message };
-            }
+            return (async () => {
+              try {
+                const handle = await getNewFileHandle(nameToUse);
+                if (!handle) return { success: false, error: 'Cancelled' };
+                await writeFile(handle, exportToJSON());
+                const file = await handle.getFile();
+                set({ fileHandle: handle, currentFileName: file.name, isDirty: false, lastSavedAt: new Date().toISOString() });
+                return { success: true };
+              } catch (e) {
+                return { success: false, error: e.message };
+              }
+            })();
           } else {
             const blob = new Blob([exportToJSON()], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             a.download = nameToUse.endsWith('.json') ? nameToUse : `${nameToUse}.json`;
+            a.style.display = 'none';
+            document.body.appendChild(a);
             a.click();
-            URL.revokeObjectURL(url);
+            setTimeout(() => {
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+            }, 100);
             set({ currentFileName: a.download, isDirty: false, lastSavedAt: new Date().toISOString() });
-            return { success: true };
+            return Promise.resolve({ success: true });
           }
         },
       }),
