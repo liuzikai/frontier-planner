@@ -306,6 +306,7 @@ const Canvas = () => {
           onBeforeDelete={onBeforeDelete}
           nodeTypes={nodeTypes}
           defaultEdgeOptions={defaultEdgeOptions}
+          elevateNodesOnSelect={true}
           fitView
           fitViewOptions={{ padding: 0.2 }}
           minZoom={0.1}

@@ -6,8 +6,8 @@ import Tooltip from './Tooltip';
 
 const statusColors = {
   'todo': 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300',
-  'in-progress': 'bg-blue-50 dark:bg-blue-900/30 border-blue-400 dark:border-blue-700 text-blue-700 dark:text-blue-300',
-  'done': 'bg-green-50 dark:bg-green-900/30 border-green-400 dark:border-green-700 text-green-700 dark:text-green-300',
+  'in-progress': 'bg-blue-50 dark:bg-blue-800 border-blue-400 dark:border-blue-600 text-blue-700 dark:text-blue-200',
+  'done': 'bg-green-50 dark:bg-green-800 border-green-400 dark:border-green-600 text-green-700 dark:text-green-200',
   'someday': 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 border-dashed text-gray-700 dark:text-gray-400',
 };
 

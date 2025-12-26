@@ -84,3 +84,12 @@ html, body, #root {
 .react-flow__edge-interaction {
   stroke-width: 20 !important;
 }
+
+/* Ensure nodes are always above edges, even with opacity */
+.react-flow__nodes {
+  z-index: 10;
+}
+
+.react-flow__edges {
+  z-index: 5;
+}
