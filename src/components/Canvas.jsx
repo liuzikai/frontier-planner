@@ -161,15 +161,17 @@ const Canvas = () => {
   // Handle double-click to add new task
   const handlePaneDoubleClick = useCallback(
     (event) => {
-      // Get the position relative to the flow
-      const bounds = event.target.getBoundingClientRect();
-      const position = {
-        x: event.clientX - bounds.left,
-        y: event.clientY - bounds.top,
-      };
+      if (!reactFlowInstance) return;
+      
+      // Convert screen coordinates to flow coordinates
+      const position = reactFlowInstance.screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+      
       addTask(position);
     },
-    [addTask]
+    [addTask, reactFlowInstance]
   );
 
   // Handle click on empty canvas to deselect all
@@ -239,6 +241,7 @@ const Canvas = () => {
           panOnScroll
           panOnScrollMode="free"
           zoomOnScroll={false}
+          zoomOnDoubleClick={false}
           zoomOnPinch
         >
           <Background
