@@ -58,6 +58,14 @@ const Canvas = () => {
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // Don't trigger global shortcuts if user is typing in an input or textarea
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
+        // Only allow Save shortcut even when typing
+        if (!((e.ctrlKey || e.metaKey) && e.key === 's')) {
+          return;
+        }
+      }
+
       // Save: Ctrl+S or Cmd+S
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
@@ -176,28 +184,6 @@ const Canvas = () => {
       },
     };
   });
-
-  // Keyboard shortcuts for undo/redo
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      // Check for Cmd/Ctrl + Z (undo) or Cmd/Ctrl + Shift + Z / Cmd/Ctrl + Y (redo)
-      if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
-        e.preventDefault();
-        if (e.shiftKey) {
-          redo();
-        } else {
-          undo();
-        }
-      }
-      if ((e.metaKey || e.ctrlKey) && e.key === 'y') {
-        e.preventDefault();
-        redo();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [undo, redo]);
 
   // Get center of current viewport for adding new tasks
   const getViewportCenter = useCallback(() => {
