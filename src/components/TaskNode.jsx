@@ -47,7 +47,6 @@ const TaskNode = ({ id, data, selected }) => {
       ? `color-mix(in srgb, ${primaryTag.color}, #1f2937 85%)` 
       : `color-mix(in srgb, ${primaryTag.color}, white 85%)`,
     borderColor: `${primaryTag.color}80`, // More descriptive border
-    boxShadow: `0 0 15px ${primaryTag.color}10`, // Subtle inner glow
   } : {};
 
   return (
