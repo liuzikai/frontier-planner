@@ -250,11 +250,13 @@ export const useStore = create(
         isNativeFileSystemSupported: 'showSaveFilePicker' in window && window.isSecureContext,
         darkMode: false,
         selectionMode: 'pan', // 'pan' or 'select'
+        colorMode: 'status', // 'status' or 'tag'
         _preDragNodes: null,
 
         // Actions
         toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
         setSelectionMode: (mode) => set({ selectionMode: mode }),
+        setColorMode: (mode) => set({ colorMode: mode }),
 
         createSnapshot: (name) => {
           const { nodes, edges, tags } = get();

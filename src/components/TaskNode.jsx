@@ -21,6 +21,7 @@ const statusLabels = {
 const TaskNode = ({ id, data, selected }) => {
   const deleteTask = useStore((state) => state.deleteTask);
   const tags = useStore((state) => state.tags);
+  const colorMode = useStore((state) => state.colorMode);
 
   const handleDelete = (e) => {
     e.stopPropagation();
@@ -33,12 +34,26 @@ const TaskNode = ({ id, data, selected }) => {
   // Determine opacity for done and someday tasks
   const nodeOpacity = data.status === 'done' ? 'opacity-40' : (data.status === 'someday' ? 'opacity-60' : 'opacity-100');
 
+  // Determine node background color based on color mode
+  const nodeBgClass = colorMode === 'status' 
+    ? statusColors[data.status] 
+    : (primaryTag 
+        ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300' 
+        : statusColors[data.status]);
+
+  const tagStyle = (colorMode === 'tag' && primaryTag) ? {
+    backgroundColor: `${primaryTag.color}15`, // Very light background
+    borderColor: `${primaryTag.color}80`, // More descriptive border
+    boxShadow: `0 0 15px ${primaryTag.color}10`, // Subtle inner glow
+  } : {};
+
   return (
     <div className={`relative group ${nodeOpacity}`}>
       <div
+        style={tagStyle}
         className={`
           min-w-[180px] max-w-[240px] rounded-xl shadow-xl border-2 transition-all duration-300
-          ${statusColors[data.status]}
+          ${nodeBgClass}
           ${selected ? 'ring-2 ring-purple-500 ring-offset-4 ring-offset-white dark:ring-offset-gray-900 scale-105 shadow-2xl' : 'hover:shadow-2xl hover:-translate-y-1'}
           ${data.isFrontier ? 'ring-4 ring-orange-500 ring-offset-2 ring-offset-white dark:ring-offset-gray-900 shadow-orange-500/30' : ''}
         `}

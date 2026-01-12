@@ -49,7 +49,9 @@ const Canvas = () => {
     isDirty,
     darkMode,
     toggleDarkMode,
-    selectionMode
+    selectionMode,
+    colorMode,
+    setColorMode
   } = useStore();
 
   const undo = useTemporalStore((state) => state.undo);
@@ -157,6 +159,7 @@ const Canvas = () => {
   // Frontier info shown for all selected nodes; time info only for single selection
   const nodesWithSelection = useMemo(() => nodes.map((node) => ({
     ...node,
+    zIndex: node.selected ? 1000 : 10, // Ensure nodes are above edges
     // Note: selected state is now managed directly in the store's nodes array
     // to avoid infinite update loops with onSelectionChange.
     data: {
@@ -304,6 +307,17 @@ const Canvas = () => {
             color={darkMode ? '#374151' : '#e5e7eb'}
           />
           <Controls className="!bg-white dark:!bg-gray-800 !rounded-xl !shadow-xl !border !border-gray-200 dark:!border-gray-700 !overflow-hidden">
+            <ControlButton
+              onClick={() => setColorMode(colorMode === 'status' ? 'tag' : 'status')}
+              title={colorMode === 'status' ? 'Switch to Tag Coloring' : 'Switch to Status Coloring'}
+              className={colorMode === 'tag'
+                ? '!bg-purple-50 dark:!bg-purple-900/40 !text-purple-600 dark:!text-purple-400 !border-none'
+                : '!bg-white dark:!bg-gray-800 !text-gray-600 dark:!text-gray-400 hover:!bg-gray-50 dark:hover:!bg-gray-700 !border-none'}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m12 3 1.912 5.886 6.188.048-4.981 3.66 1.886 5.894-5.005-3.626-5.005 3.626 1.886-5.894-4.981-3.66 6.188-.048z"></path>
+              </svg>
+            </ControlButton>
             <ControlButton
               onClick={() => setShowMiniMap(!showMiniMap)}
               title={showMiniMap ? 'Hide minimap' : 'Show minimap'}
