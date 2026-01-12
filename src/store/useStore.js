@@ -631,6 +631,9 @@ export const useStore = create(
         isDirty: state.isDirty,
         snapshots: state.snapshots,
         darkMode: state.darkMode,
+        selectionMode: state.selectionMode,
+        colorMode: state.colorMode,
+        animationsEnabled: state.animationsEnabled,
       }),
     }
   )
