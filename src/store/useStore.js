@@ -249,10 +249,12 @@ export const useStore = create(
         snapshots: [], // Persisted versions
         isNativeFileSystemSupported: 'showSaveFilePicker' in window && window.isSecureContext,
         darkMode: false,
+        selectionMode: 'pan', // 'pan' or 'select'
         _preDragNodes: null,
 
         // Actions
         toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
+        setSelectionMode: (mode) => set({ selectionMode: mode }),
 
         createSnapshot: (name) => {
           const { nodes, edges, tags } = get();
@@ -281,6 +283,21 @@ export const useStore = create(
           });
         },
         onNodesChange: (changes) => {
+          const currentNodes = get().nodes;
+          const nextNodes = applyNodeChanges(changes, currentNodes);
+          
+          // Sync selectedNodes and selectedNode if selection changes occurred
+          const selectionChanges = changes.filter(c => c.type === 'select');
+          let nextSelectedNodes = get().selectedNodes;
+          let nextSelectedNode = get().selectedNode;
+
+          if (selectionChanges.length > 0) {
+            nextSelectedNodes = nextNodes
+              .filter(n => n.selected)
+              .map(n => n.id);
+            nextSelectedNode = nextSelectedNodes.length === 1 ? nextSelectedNodes[0] : null;
+          }
+
           const isOnlyInternal = changes.every(
             (c) => c.type === 'dimensions' || c.type === 'position' || c.type === 'select'
           );
@@ -289,13 +306,26 @@ export const useStore = create(
             const isTracking = useStore.temporal.getState().isTracking;
             if (isTracking) {
               useStore.temporal.getState().pause();
-              set({ nodes: applyNodeChanges(changes, get().nodes) });
+              set({ 
+                nodes: nextNodes, 
+                selectedNodes: nextSelectedNodes, 
+                selectedNode: nextSelectedNode 
+              });
               useStore.temporal.getState().resume();
             } else {
-              set({ nodes: applyNodeChanges(changes, get().nodes) });
+              set({ 
+                nodes: nextNodes, 
+                selectedNodes: nextSelectedNodes, 
+                selectedNode: nextSelectedNode 
+              });
             }
           } else {
-            set({ nodes: applyNodeChanges(changes, get().nodes), isDirty: true });
+            set({ 
+              nodes: nextNodes, 
+              selectedNodes: nextSelectedNodes, 
+              selectedNode: nextSelectedNode,
+              isDirty: true 
+            });
           }
         },
 
@@ -352,13 +382,27 @@ export const useStore = create(
 
         setSelectedNode: (id) => {
           useStore.temporal.getState().pause();
-          set({ selectedNode: id, selectedNodes: id ? [id] : [] });
+          set({ 
+            selectedNode: id, 
+            selectedNodes: id ? [id] : [],
+            nodes: get().nodes.map(node => ({
+              ...node,
+              selected: node.id === id
+            }))
+          });
           useStore.temporal.getState().resume();
         },
 
         setSelectedNodes: (ids) => {
           useStore.temporal.getState().pause();
-          set({ selectedNodes: ids, selectedNode: ids.length === 1 ? ids[0] : null });
+          set({ 
+            selectedNodes: ids, 
+            selectedNode: ids.length === 1 ? ids[0] : null,
+            nodes: get().nodes.map(node => ({
+              ...node,
+              selected: ids.includes(node.id)
+            }))
+          });
           useStore.temporal.getState().resume();
         },
 

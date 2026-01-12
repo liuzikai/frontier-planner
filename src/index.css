@@ -103,3 +103,16 @@ html, body, #root {
 .react-flow__edges {
   z-index: 5;
 }
+
+/* Cursor styles for selection mode */
+.selection-mode .react-flow__pane {
+  cursor: crosshair !important;
+}
+
+.pan-mode .react-flow__pane {
+  cursor: grab;
+}
+
+.pan-mode .react-flow__pane:active {
+  cursor: grabbing;
+}

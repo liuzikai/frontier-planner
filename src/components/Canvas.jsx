@@ -48,7 +48,8 @@ const Canvas = () => {
     lastLoadedAt,
     isDirty,
     darkMode,
-    toggleDarkMode
+    toggleDarkMode,
+    selectionMode
   } = useStore();
 
   const undo = useTemporalStore((state) => state.undo);
@@ -154,15 +155,16 @@ const Canvas = () => {
 
   // Sync our selectedNodes with React Flow's selection state and add frontier info
   // Frontier info shown for all selected nodes; time info only for single selection
-  const nodesWithSelection = nodes.map((node) => ({
+  const nodesWithSelection = useMemo(() => nodes.map((node) => ({
     ...node,
-    selected: selectedNodes.includes(node.id),
+    // Note: selected state is now managed directly in the store's nodes array
+    // to avoid infinite update loops with onSelectionChange.
     data: {
       ...node.data,
       isFrontier: frontierTasks.has(node.id),
       cumulativeTime: cumulativeTimes.get(node.id),
     },
-  }));
+  })), [nodes, frontierTasks, cumulativeTimes]);
 
   // Style edges based on source node status
   const edgesWithStyle = edges.map((edge) => {
@@ -259,17 +261,8 @@ const Canvas = () => {
     [setSelectedNode, setSelectedNodes, selectedNodes]
   );
 
-  // Handle selection change from React Flow (for box select and multi-select)
-  const handleSelectionChange = useCallback(
-    ({ nodes: selectedNodesFromFlow }) => {
-      const selectedIds = selectedNodesFromFlow.map((n) => n.id);
-      setSelectedNodes(selectedIds);
-    },
-    [setSelectedNodes]
-  );
-
   return (
-    <div className="flex h-screen w-full">
+    <div className={`flex h-screen w-full ${selectionMode === 'select' ? 'selection-mode' : 'pan-mode'}`}>
       {/* Main Canvas */}
       <div className="flex-1 relative">
         <Toolbar getViewportCenter={getViewportCenter} />
@@ -282,7 +275,6 @@ const Canvas = () => {
           onPaneClick={handlePaneClick}
           onEdgeClick={handleEdgeClick}
           onNodeClick={handleNodeClick}
-          onSelectionChange={handleSelectionChange}
           onDoubleClick={handlePaneDoubleClick}
           onNodeDragStart={onNodeDragStart}
           onNodeDragStop={onNodeDragStop}
@@ -298,6 +290,9 @@ const Canvas = () => {
           snapGrid={[15, 15]}
           panOnScroll
           panOnScrollMode="free"
+          panOnDrag={selectionMode === 'pan'}
+          selectionOnDrag={selectionMode === 'select'}
+          selectionMode="touch" // Select nodes that are touched by the selection box
           zoomOnScroll={false}
           zoomOnDoubleClick={false}
           zoomOnPinch
