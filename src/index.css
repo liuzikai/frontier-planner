@@ -2,8 +2,6 @@
 
 @variant dark (&:where(.dark, .dark *));
 
-@variant dark (&:where(.dark, .dark *));
-
 /* React Flow base styles */
 @import "@xyflow/react/dist/style.css";
 

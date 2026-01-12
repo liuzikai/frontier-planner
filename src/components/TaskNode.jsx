@@ -22,6 +22,7 @@ const TaskNode = ({ id, data, selected }) => {
   const deleteTask = useStore((state) => state.deleteTask);
   const tags = useStore((state) => state.tags);
   const colorMode = useStore((state) => state.colorMode);
+  const darkMode = useStore((state) => state.darkMode);
 
   const handleDelete = (e) => {
     e.stopPropagation();
@@ -42,7 +43,9 @@ const TaskNode = ({ id, data, selected }) => {
         : statusColors[data.status]);
 
   const tagStyle = (colorMode === 'tag' && primaryTag) ? {
-    backgroundColor: `${primaryTag.color}15`, // Very light background
+    backgroundColor: darkMode 
+      ? `color-mix(in srgb, ${primaryTag.color}, #1f2937 85%)` 
+      : `color-mix(in srgb, ${primaryTag.color}, white 85%)`,
     borderColor: `${primaryTag.color}80`, // More descriptive border
     boxShadow: `0 0 15px ${primaryTag.color}10`, // Subtle inner glow
   } : {};

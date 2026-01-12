@@ -208,6 +208,7 @@ const Canvas = () => {
     
     return {
       ...edge,
+      zIndex: isSelected ? 50 : 0, // Ensure edges stay below nodes (which are 100+)
       animated: animationsEnabled && (isSelected || (!isDone && !isSomeday)),
       style: {
         strokeWidth: isSelected ? 3 : 2,
