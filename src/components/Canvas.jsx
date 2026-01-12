@@ -132,6 +132,34 @@ const Canvas = () => {
     }
   }, [selectedNode]);
 
+  // Stable MiniMap styling functions to prevent unnecessary re-renders
+  const miniMapNodeColor = useCallback((node) => {
+    if (node.selected) return '#8b5cf6'; // purple-500
+    if (node.data?.isFrontier) return '#f97316'; // orange-500
+    switch (node.data?.status) {
+      case 'done':
+        return '#22c55e';
+      case 'in-progress':
+        return '#3b82f6';
+      default:
+        return darkMode ? '#4b5563' : '#9ca3af';
+    }
+  }, [darkMode]);
+
+  const miniMapNodeStrokeColor = useCallback((node) => {
+    if (node.selected) return '#7c3aed'; // purple-700
+    if (node.data?.isFrontier) return '#c2410c'; // orange-700
+    return 'transparent';
+  }, []);
+
+  const miniMapNodeStrokeWidth = useCallback((node) => 
+    (node.selected || node.data?.isFrontier ? 4 : 0)
+  , []);
+
+  const miniMapMaskColor = useMemo(() => 
+    darkMode ? "rgba(0, 0, 0, 0.4)" : "rgba(243, 244, 246, 0.6)"
+  , [darkMode]);
+
   // Calculate frontier tasks for all selected nodes
   const frontierTasks = useMemo(() => {
     if (selectedNodes.length === 0) {
@@ -357,25 +385,10 @@ const Canvas = () => {
           </Controls>
           {showMiniMap && (
             <MiniMap
-              nodeColor={(node) => {
-                if (node.selected) return '#8b5cf6'; // purple-500
-                if (node.data?.isFrontier) return '#f97316'; // orange-500
-                switch (node.data?.status) {
-                  case 'done':
-                    return '#22c55e';
-                  case 'in-progress':
-                    return '#3b82f6';
-                  default:
-                    return darkMode ? '#4b5563' : '#9ca3af';
-                }
-              }}
-              nodeStrokeColor={(node) => {
-                if (node.selected) return '#7c3aed'; // purple-700
-                if (node.data?.isFrontier) return '#c2410c'; // orange-700
-                return 'transparent';
-              }}
-              nodeStrokeWidth={(node) => (node.selected || node.data?.isFrontier ? 4 : 0)}
-              maskColor={darkMode ? "rgba(0, 0, 0, 0.4)" : "rgba(243, 244, 246, 0.6)"}
+              nodeColor={miniMapNodeColor}
+              nodeStrokeColor={miniMapNodeStrokeColor}
+              nodeStrokeWidth={miniMapNodeStrokeWidth}
+              maskColor={miniMapMaskColor}
               className="!bg-white/80 dark:!bg-gray-800/80 !backdrop-blur-md !rounded-2xl !shadow-2xl !border !border-gray-200 dark:!border-gray-700 !left-10 animate-in fade-in slide-in-from-left-5 duration-500"
               style={{ width: 200, height: 140 }}
               position="bottom-left"
