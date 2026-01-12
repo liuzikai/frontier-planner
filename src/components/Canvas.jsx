@@ -51,7 +51,9 @@ const Canvas = () => {
     toggleDarkMode,
     selectionMode,
     colorMode,
-    setColorMode
+    setColorMode,
+    animationsEnabled,
+    toggleAnimations
   } = useStore();
 
   const undo = useTemporalStore((state) => state.undo);
@@ -206,7 +208,7 @@ const Canvas = () => {
     
     return {
       ...edge,
-      animated: isSelected || (!isDone && !isSomeday),
+      animated: animationsEnabled && (isSelected || (!isDone && !isSomeday)),
       style: {
         strokeWidth: isSelected ? 3 : 2,
         stroke: isSelected 
@@ -347,6 +349,17 @@ const Canvas = () => {
               </svg>
             </ControlButton>
             <ControlButton
+              onClick={toggleAnimations}
+              title={animationsEnabled ? 'Disable Animations' : 'Enable Animations'}
+              className={!animationsEnabled
+                ? '!bg-blue-50 dark:!bg-blue-900/40 !text-blue-600 dark:!text-blue-400 !border-none'
+                : '!bg-white dark:!bg-gray-800 !text-gray-600 dark:!text-gray-400 hover:!bg-gray-50 dark:hover:!bg-gray-700 !border-none'}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+              </svg>
+            </ControlButton>
+            <ControlButton
               onClick={() => setShowMiniMap(!showMiniMap)}
               title={showMiniMap ? 'Hide minimap' : 'Show minimap'}
               className={showMiniMap 
@@ -389,7 +402,7 @@ const Canvas = () => {
               nodeStrokeColor={miniMapNodeStrokeColor}
               nodeStrokeWidth={miniMapNodeStrokeWidth}
               maskColor={miniMapMaskColor}
-              className="!bg-white/80 dark:!bg-gray-800/80 !backdrop-blur-md !rounded-2xl !shadow-2xl !border !border-gray-200 dark:!border-gray-700 !left-10 animate-in fade-in slide-in-from-left-5 duration-500"
+              className={`!bg-white/80 dark:!bg-gray-800/80 !backdrop-blur-md !rounded-2xl !shadow-2xl !border !border-gray-200 dark:!border-gray-700 !left-10 ${animationsEnabled ? 'animate-in fade-in slide-in-from-left-5 duration-500' : ''}`}
               style={{ width: 200, height: 140 }}
               position="bottom-left"
             />

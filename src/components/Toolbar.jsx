@@ -16,7 +16,8 @@ const Toolbar = ({ getViewportCenter }) => {
     isNativeFileSystemSupported,
     tags,
     selectionMode,
-    setSelectionMode
+    setSelectionMode,
+    animationsEnabled
   } = useStore();
   const [showTagManager, setShowTagManager] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
@@ -286,7 +287,7 @@ const Toolbar = ({ getViewportCenter }) => {
             : 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-400'
         }`}>
           <span className="max-w-[150px] truncate">{currentFileName}</span>
-          {isDirty && <span className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse" />}
+          {isDirty && <span className={`w-1.5 h-1.5 bg-orange-500 rounded-full ${animationsEnabled ? 'animate-pulse' : ''}`} />}
         </div>
       )}
 

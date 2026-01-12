@@ -251,12 +251,14 @@ export const useStore = create(
         darkMode: false,
         selectionMode: 'pan', // 'pan' or 'select'
         colorMode: 'status', // 'status' or 'tag'
+        animationsEnabled: true,
         _preDragNodes: null,
 
         // Actions
         toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
         setSelectionMode: (mode) => set({ selectionMode: mode }),
         setColorMode: (mode) => set({ colorMode: mode }),
+        toggleAnimations: () => set((state) => ({ animationsEnabled: !state.animationsEnabled })),
 
         createSnapshot: (name) => {
           const { nodes, edges, tags } = get();
