@@ -189,7 +189,7 @@ const Canvas = () => {
   // Frontier info shown for all selected nodes; time info only for single selection
   const nodesWithSelection = useMemo(() => nodes.map((node) => ({
     ...node,
-    zIndex: node.selected ? 1000 : 10, // Ensure nodes are above edges
+    zIndex: node.selected ? 1000 : 100, // Ensure nodes are always above edges
     // Note: selected state is now managed directly in the store's nodes array
     // to avoid infinite update loops with onSelectionChange.
     data: {
@@ -313,7 +313,6 @@ const Canvas = () => {
           onNodeDragStop={onNodeDragStop}
           nodeTypes={nodeTypes}
           defaultEdgeOptions={defaultEdgeOptions}
-          elevateNodesOnSelect={true}
           fitView
           fitViewOptions={{ padding: 0.2 }}
           minZoom={0.1}

@@ -97,11 +97,11 @@ html, body, #root {
 
 /* Ensure nodes are always above edges, even with opacity */
 .react-flow__nodes {
-  z-index: 10 !important;
+  z-index: 100 !important;
 }
 
 .react-flow__edges {
-  z-index: 5 !important;
+  z-index: 1 !important;
 }
 
 /* Cursor styles for selection mode */
