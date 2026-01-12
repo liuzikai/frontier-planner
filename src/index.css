@@ -59,6 +59,16 @@ html, body, #root {
   fill: currentColor !important;
 }
 
+/* React Flow Attribution Dark Mode */
+.dark .react-flow__attribution {
+  background-color: rgba(31, 41, 55, 0.5) !important; /* gray-800 with transparency */
+  color: #6b7280 !important; /* gray-500 */
+}
+
+.dark .react-flow__attribution a {
+  color: #6b7280 !important;
+}
+
 /* Edge Selection Styles */
 .react-flow__edge-path {
   transition: stroke 0.2s, stroke-width 0.2s;
