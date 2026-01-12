@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useStore } from '../store/useStore';
 
 const TagManager = ({ isOpen, onClose }) => {
-  const { tags, addTag, updateTag, deleteTag } = useStore();
+  const { tags, addTag, updateTag, deleteTag, moveTag } = useStore();
   const [editingId, setEditingId] = useState(null);
   const [editName, setEditName] = useState('');
   const [editColor, setEditColor] = useState('');
@@ -193,6 +193,26 @@ const TagManager = ({ isOpen, onClose }) => {
                           <p className="text-[10px] text-gray-400 dark:text-gray-500 font-mono uppercase tracking-wider">{tag.color}</p>
                         </div>
                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); moveTag(tag.id, 'up'); }}
+                            disabled={tags.findIndex(t => t.id === tag.id) === 0}
+                            className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                            title="Move up"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); moveTag(tag.id, 'down'); }}
+                            disabled={tags.findIndex(t => t.id === tag.id) === tags.length - 1}
+                            className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                            title="Move down"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                          </button>
                           <button
                             onClick={() => handleStartEdit(tag)}
                             className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/50 rounded-xl transition-colors"

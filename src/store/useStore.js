@@ -438,6 +438,21 @@ export const useStore = create(
           });
         },
 
+        moveTag: (id, direction) => {
+          const tags = [...get().tags];
+          const index = tags.findIndex((t) => t.id === id);
+          if (index === -1) return;
+          
+          const newIndex = direction === 'up' ? index - 1 : index + 1;
+          if (newIndex < 0 || newIndex >= tags.length) return;
+          
+          const temp = tags[index];
+          tags[index] = tags[newIndex];
+          tags[newIndex] = temp;
+          
+          set({ tags, isDirty: true });
+        },
+
         // Drag Handling
         onNodeDragStart: () => {
           useStore.temporal.getState().pause();
