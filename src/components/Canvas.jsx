@@ -216,7 +216,7 @@ const Canvas = () => {
           ? (darkMode ? '#c084fc' : '#a855f7') 
           : ((isDone || isSomeday) ? '#9ca3af' : '#6366f1'),
         opacity: isSelected ? 1 : ((isDone || isSomeday) ? 0.4 : 1),
-        strokeDasharray: (isDone || isSomeday) && !isSelected ? '5,5' : undefined,
+        strokeDasharray: !animationsEnabled || ((isDone || isSomeday) && !isSelected) ? '5,5' : undefined,
       },
     };
   });
