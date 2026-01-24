@@ -160,7 +160,7 @@ const Toolbar = ({ getViewportCenter }) => {
           <button
             onClick={handleSave}
             className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors relative"
-            title="Download Project"
+            title="Download Canvas"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -198,10 +198,10 @@ const Toolbar = ({ getViewportCenter }) => {
         disabled={!canRedo}
         className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all shadow-xl border border-gray-200 dark:border-gray-700 active:scale-95 ${
           canRedo
-            ? 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
+            ? 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
             : 'bg-gray-50 dark:bg-gray-800/50 text-gray-300 dark:text-gray-700 cursor-not-allowed'
         }`}
-        title="Redo (Ctrl+Y)"
+        title="Redo (Ctrl+Alt+Z)"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
           <path fillRule="evenodd" d="M10.293 14.707a1 1 0 001.414 0l4-4a1 1 0 000-1.414l-4-4a1 1 0 00-1.414 1.414L12.586 9H5a2 2 0 00-2 2v4a1 1 0 102 0v-4h7.586l-2.293 2.293a1 1 0 000 1.414z" clipRule="evenodd" />
@@ -297,7 +297,7 @@ const Toolbar = ({ getViewportCenter }) => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 dark:bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-gray-200 dark:border-gray-700 animate-in zoom-in-95 duration-200">
             <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
-              <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100">Download Project</h2>
+              <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100">Download Canvas</h2>
               <button onClick={() => setShowDownloadModal(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

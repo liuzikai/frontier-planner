@@ -89,8 +89,8 @@ const Canvas = () => {
         e.preventDefault();
         undo();
       }
-      // Redo: Ctrl+Y or Cmd+Y or Ctrl+Shift+Z
-      if (((e.ctrlKey || e.metaKey) && e.key === 'y') || ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z')) {
+      // Redo: Ctrl+Alt+Z or Cmd+Alt+Z or Ctrl+Y or Cmd+Y
+      if (((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'z') || ((e.ctrlKey || e.metaKey) && e.key === 'y')) {
         e.preventDefault();
         redo();
       }
