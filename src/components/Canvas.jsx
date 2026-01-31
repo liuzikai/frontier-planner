@@ -187,17 +187,25 @@ const Canvas = () => {
 
   // Sync our selectedNodes with React Flow's selection state and add frontier info
   // Frontier info shown for all selected nodes; time info only for single selection
-  const nodesWithSelection = useMemo(() => nodes.map((node) => ({
-    ...node,
-    zIndex: node.selected ? 1000 : 100, // Ensure nodes are always above edges
-    // Note: selected state is now managed directly in the store's nodes array
-    // to avoid infinite update loops with onSelectionChange.
-    data: {
-      ...node.data,
-      isFrontier: frontierTasks.has(node.id),
-      cumulativeTime: cumulativeTimes.get(node.id),
-    },
-  })), [nodes, frontierTasks, cumulativeTimes]);
+  const nodesWithSelection = useMemo(() => nodes.map((node) => {
+    // Calculate z-index based on y position: nodes lower on canvas appear in front
+    // Base: 100, add y position scaled down to avoid huge numbers
+    // Selected nodes get +10000 to always be on top
+    const baseZIndex = 100 + Math.floor(node.position.y / 10);
+    const zIndex = node.selected ? baseZIndex + 10000 : baseZIndex;
+    
+    return {
+      ...node,
+      zIndex,
+      // Note: selected state is now managed directly in the store's nodes array
+      // to avoid infinite update loops with onSelectionChange.
+      data: {
+        ...node.data,
+        isFrontier: frontierTasks.has(node.id),
+        cumulativeTime: cumulativeTimes.get(node.id),
+      },
+    };
+  }), [nodes, frontierTasks, cumulativeTimes]);
 
   // Style edges based on source node status
   const edgesWithStyle = edges.map((edge) => {
