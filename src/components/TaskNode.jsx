@@ -105,13 +105,6 @@ const TaskNode = ({ id, data, selected }) => {
             </div>
             <h3 className="font-bold text-[13px] leading-tight break-words text-gray-800 dark:text-gray-100">
               {data.title || 'Untitled Task'}
-              {data.note && (
-                <span className="text-gray-400 dark:text-gray-500 ml-1 inline-block" style={{ verticalAlign: '0.05em' }} title="Has note">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 inline" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
-                  </svg>
-                </span>
-              )}
             </h3>
           </div>
         </div>
@@ -119,8 +112,15 @@ const TaskNode = ({ id, data, selected }) => {
         {/* Body */}
         {data.description && (
           <div className="px-3 py-2">
-            <p className="text-[11px] text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2">
+            <p className="text-[11px] text-gray-600 dark:text-gray-400 leading-relaxed">
               {data.description}
+              {data.note && (
+                <span className="text-gray-400 dark:text-gray-500 ml-1 inline-block" style={{ verticalAlign: '0.05em' }} title="Has note">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 inline" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                  </svg>
+                </span>
+              )}
             </p>
           </div>
         )}
