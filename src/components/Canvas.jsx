@@ -203,6 +203,7 @@ const Canvas = () => {
         ...node.data,
         isFrontier: frontierTasks.has(node.id),
         cumulativeTime: cumulativeTimes.get(node.id),
+        showQuestionMark: cumulativeTimes.get(node.id)?.showQuestionMark || false,
       },
     };
   }), [nodes, frontierTasks, cumulativeTimes]);

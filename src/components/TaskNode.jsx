@@ -164,11 +164,11 @@ const TaskNode = ({ id, data, selected }) => {
           </Tooltip>
         )}
         
-        {/* Frontier node with no estimated time - show "?" */}
-        {data.isFrontier && !data.estimatedTime && (
+        {/* Node with no estimated time in selected subgraph - show "?" */}
+        {data.showQuestionMark && (
           <Tooltip
-            content="Frontier node: Ready to start (all dependencies complete) but missing estimated time"
-            className="absolute -top-10 right-0 z-50"
+            content="This node is in the dependency path but has no estimated time"
+            className="absolute -top-10 right-0 z-[2000]"
           >
             <div className="bg-orange-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl shadow-xl cursor-help animate-in fade-in zoom-in duration-200">
               ?

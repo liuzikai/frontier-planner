@@ -3,11 +3,11 @@
  * 
  * DESIGN OVERVIEW:
  * ================
- * Calculate cumulative time estimates from frontier nodes to a selected node.
+ * Calculate cumulative time estimates for a selected node by backtracing from it.
  * 
  * TWO METRICS:
- * - Sum: Total time if all tasks were done serially (sum of all dependency times)
- * - Min: Minimum time with maximum parallelism (max of parallel dependency times)
+ * - Sum: Total time counting each unique task once (avoids double-counting shared ancestors)
+ * - Min: Minimum time with maximum parallelism (critical path)
  * 
  * TIME UNITS:
  * - 1 week = 5 days (work days)
@@ -16,13 +16,10 @@
  * 
  * ALGORITHM:
  * ==========
- * 1. Start from frontier nodes (already identified)
- * 2. For each frontier: outputTime = { sum: ownTime, min: ownTime }
- * 3. Traverse dependencies forward (topologically):
- *    - For each node with dependencies:
- *      - sum = sum of all input sums + own time
- *      - min = max of all input mins + own time
- * 4. If a node has no estimated time, it doesn't propagate time (acts as barrier)
+ * 1. Start from selected node and backtrace to find all ancestors
+ * 2. For Sum: Count own time of each unique ancestor exactly once (avoid double-counting)
+ * 3. For Min: Recursively calculate: own_time + max(min_time of all direct parents)
+ * 4. Done/someday nodes contribute 0 time and stop the search
  */
 
 /**
@@ -75,146 +72,275 @@ export const formatTime = (days) => {
 };
 
 /**
- * Find all ancestor tasks of a given task by traversing backwards through edges
- * @param {string} taskId - The target task ID
- * @param {Array} edges - All edges in the graph
- * @param {Set} visited - Set to track visited nodes (prevents cycles)
- * @returns {Set} Set of ancestor task IDs
+ * Calculate min time (critical path) for a node recursively with memoization
+ * @param {string} nodeId - The node ID to calculate
+ * @param {Array} nodes - All nodes
+ * @param {Array} edges - All edges
+ * @param {Map} memo - Memoization map
+ * @returns {number|null} Min time in days, or null if invalid (node or ancestor has no time)
  */
-const findAncestors = (taskId, edges, visited = new Set()) => {
-  if (visited.has(taskId)) {
+const calculateMinTime = (nodeId, nodes, edges, memo) => {
+  // Check memo
+  if (memo.has(nodeId)) {
+    return memo.get(nodeId);
+  }
+  
+  const node = nodes.find(n => n.id === nodeId);
+  if (!node) {
+    memo.set(nodeId, null);
+    return null;
+  }
+  
+  // Done/someday nodes contribute 0 time
+  if (node.data.status === 'done' || node.data.status === 'someday') {
+    memo.set(nodeId, 0);
+    return 0;
+  }
+  
+  // If node has no estimated time, return null (invalid)
+  if (!node.data.estimatedTime) {
+    memo.set(nodeId, null);
+    return null;
+  }
+  
+  // Get own time
+  const ownTime = convertToDays(node.data.estimatedTime, node.data.estimatedTimeUnit);
+  
+  // Find all direct parents (incoming edges)
+  const parents = edges.filter(edge => edge.target === nodeId).map(edge => edge.source);
+  
+  // If no parents, just return own time
+  if (parents.length === 0) {
+    memo.set(nodeId, ownTime);
+    return ownTime;
+  }
+  
+  // Calculate min time of all parents and take max (critical path)
+  const parentMinTimes = parents.map(parentId => calculateMinTime(parentId, nodes, edges, memo));
+  
+  // If any parent is invalid (null), this node is also invalid
+  if (parentMinTimes.some(time => time === null)) {
+    memo.set(nodeId, null);
+    return null;
+  }
+  
+  const maxParentTime = Math.max(...parentMinTimes);
+  
+  const result = ownTime + maxParentTime;
+  memo.set(nodeId, result);
+  return result;
+};
+
+/**
+ * Check if a node or any of its ancestors has missing time, with cycle detection
+ * @param {string} nodeId - The node ID to check
+ * @param {Array} nodes - All nodes
+ * @param {Array} edges - All edges
+ * @param {Set} visited - Set to track visited nodes (prevents cycles)
+ * @param {Map} invalidCache - Cache for invalid status
+ * @returns {boolean} True if this node or any ancestor has missing time
+ */
+const hasInvalidAncestor = (nodeId, nodes, edges, visited = new Set(), invalidCache = new Map()) => {
+  // Check cache first
+  if (invalidCache.has(nodeId)) {
+    return invalidCache.get(nodeId);
+  }
+  
+  // Detect cycles
+  if (visited.has(nodeId)) {
+    return false; // Already being processed in this path, assume valid
+  }
+  
+  visited.add(nodeId);
+  
+  const node = nodes.find(n => n.id === nodeId);
+  if (!node) {
+    invalidCache.set(nodeId, false);
+    return false;
+  }
+  
+  // Done/someday nodes don't block (they're complete)
+  if (node.data.status === 'done' || node.data.status === 'someday') {
+    invalidCache.set(nodeId, false);
+    return false;
+  }
+  
+  // If this node has no estimated time, it's invalid
+  if (!node.data.estimatedTime) {
+    invalidCache.set(nodeId, true);
+    return true;
+  }
+  
+  // Check all parents
+  const parents = edges.filter(edge => edge.target === nodeId).map(edge => edge.source);
+  
+  for (const parentId of parents) {
+    // Create new visited set for each branch to allow different paths
+    const branchVisited = new Set(visited);
+    if (hasInvalidAncestor(parentId, nodes, edges, branchVisited, invalidCache)) {
+      invalidCache.set(nodeId, true);
+      return true;
+    }
+  }
+  
+  invalidCache.set(nodeId, false);
+  return false;
+};
+
+/**
+ * Find all unique ancestor nodes by backtracing, stopping at done/someday nodes
+ * @param {string} nodeId - The node ID to start from
+ * @param {Array} nodes - All nodes
+ * @param {Array} edges - All edges
+ * @param {Set} visited - Set to track visited nodes (prevents cycles)
+ * @returns {Set} Set of ancestor node IDs
+ */
+const findAllAncestors = (nodeId, nodes, edges, visited = new Set()) => {
+  if (visited.has(nodeId)) {
     return visited;
   }
   
-  visited.add(taskId);
+  visited.add(nodeId);
   
-  // Find all edges that point TO this task (source -> target where target = taskId)
-  const incomingEdges = edges.filter(edge => edge.target === taskId);
+  const node = nodes.find(n => n.id === nodeId);
+  if (!node) {
+    return visited;
+  }
   
-  // Recursively find ancestors of each source node
+  // Stop at done/someday nodes (don't traverse beyond them)
+  if (node.data.status === 'done' || node.data.status === 'someday') {
+    return visited;
+  }
+  
+  // Find all edges that point TO this node
+  const incomingEdges = edges.filter(edge => edge.target === nodeId);
+  
+  // Recursively find ancestors
   incomingEdges.forEach(edge => {
-    findAncestors(edge.source, edges, visited);
+    findAllAncestors(edge.source, nodes, edges, visited);
   });
   
   return visited;
 };
 
 /**
- * Calculate cumulative time estimates for all nodes
+ * Calculate cumulative time estimates for all nodes in the dependency path
  * @param {string} selectedNodeId - The target node
- * @param {Set} frontierTasks - Set of frontier task IDs
+ * @param {Set} frontierTasks - Set of frontier task IDs (for display, not calculation)
  * @param {Array} nodes - All nodes
  * @param {Array} edges - All edges
- * @returns {Map} Map of nodeId -> { sum: days, min: days }
+ * @returns {Map} Map of nodeId -> { sum: days, min: days, showQuestionMark?: boolean }
  */
 export const calculateCumulativeTimes = (selectedNodeId, frontierTasks, nodes, edges) => {
   if (!selectedNodeId) {
     return new Map();
   }
   
-  // Find all ancestors of the selected node
-  const ancestors = findAncestors(selectedNodeId, edges);
-  ancestors.delete(selectedNodeId); // Remove selected node from ancestors
-  
-  const cumulativeTimes = new Map();
-  
-  // Special case: if there are no ancestors, show selected node's own time
-  if (ancestors.size === 0) {
-    const selectedNode = nodes.find(n => n.id === selectedNodeId);
-    if (selectedNode && selectedNode.data.estimatedTime) {
-      const timeDays = convertToDays(selectedNode.data.estimatedTime, selectedNode.data.estimatedTimeUnit);
-      cumulativeTimes.set(selectedNodeId, { sum: timeDays, min: timeDays });
-    }
-    return cumulativeTimes;
+  const selectedNode = nodes.find(n => n.id === selectedNodeId);
+  if (!selectedNode) {
+    return new Map();
   }
   
-  // Initialize frontier nodes with their own time
-  frontierTasks.forEach(taskId => {
-    const node = nodes.find(n => n.id === taskId);
-    if (node && node.data.estimatedTime) {
-      const timeDays = convertToDays(node.data.estimatedTime, node.data.estimatedTimeUnit);
-      cumulativeTimes.set(taskId, { sum: timeDays, min: timeDays });
+  // Don't show time labels for completed or someday nodes
+  if (selectedNode.data.status === 'done' || selectedNode.data.status === 'someday') {
+    return new Map();
+  }
+  
+  // Find all unique ancestors by backtracing from selected node
+  const allAncestors = findAllAncestors(selectedNodeId, nodes, edges);
+  allAncestors.delete(selectedNodeId); // Remove selected node itself
+  
+  const cumulativeTimes = new Map();
+  const invalidCache = new Map();
+  
+  // Calculate min time for all nodes using memoization
+  const minMemo = new Map();
+  
+  // If selected node has no estimated time, mark it with question mark
+  if (!selectedNode.data.estimatedTime) {
+    cumulativeTimes.set(selectedNodeId, { sum: null, min: null, showQuestionMark: true });
+  }
+  
+  // Check if selected node has invalid ancestor
+  const selectedNodeIsValid = !hasInvalidAncestor(selectedNodeId, nodes, edges, new Set(), invalidCache);
+  
+  if (selectedNodeIsValid) {
+    // Calculate times for selected node
+    const totalMin = calculateMinTime(selectedNodeId, nodes, edges, minMemo);
+    
+    if (totalMin !== null) {
+      // Calculate sum: sum of own time of each unique ancestor (counted once)
+      let totalSum = 0;
+      allAncestors.forEach(ancestorId => {
+        const node = nodes.find(n => n.id === ancestorId);
+        if (node && node.data.estimatedTime) {
+          // Done/someday nodes already stopped the search, so we only have pending nodes here
+          if (node.data.status !== 'done' && node.data.status !== 'someday') {
+            totalSum += convertToDays(node.data.estimatedTime, node.data.estimatedTimeUnit);
+          }
+        }
+      });
+      
+      // Add selected node's own time to sum
+      if (selectedNode.data.estimatedTime) {
+        totalSum += convertToDays(selectedNode.data.estimatedTime, selectedNode.data.estimatedTimeUnit);
+      }
+      
+      // Set the selected node's cumulative time
+      if (totalSum > 0 || totalMin > 0) {
+        cumulativeTimes.set(selectedNodeId, { sum: totalSum, min: totalMin });
+      }
+    }
+  }
+  
+  // Calculate times for all ancestors in the path
+  allAncestors.forEach(ancestorId => {
+    const node = nodes.find(n => n.id === ancestorId);
+    if (!node || node.data.status === 'done' || node.data.status === 'someday') {
+      return;
+    }
+    
+    // If ancestor has no estimated time, mark it with question mark
+    if (!node.data.estimatedTime) {
+      cumulativeTimes.set(ancestorId, { sum: null, min: null, showQuestionMark: true });
+      return;
+    }
+    
+    // Check if this ancestor has invalid ancestors
+    if (hasInvalidAncestor(ancestorId, nodes, edges, new Set(), invalidCache)) {
+      return; // Skip ancestors with invalid time
+    }
+    
+    // Calculate min time for this ancestor (will use memo if available)
+    const ancestorMin = calculateMinTime(ancestorId, nodes, edges, minMemo);
+    
+    // Skip if min time is invalid
+    if (ancestorMin === null) {
+      return;
+    }
+    
+    // Find unique ancestors of this ancestor
+    const ancestorAncestors = findAllAncestors(ancestorId, nodes, edges);
+    ancestorAncestors.delete(ancestorId);
+    
+    // Calculate sum for this ancestor
+    let ancestorSum = 0;
+    ancestorAncestors.forEach(id => {
+      const n = nodes.find(node => node.id === id);
+      if (n && n.data.estimatedTime && n.data.status !== 'done' && n.data.status !== 'someday') {
+        ancestorSum += convertToDays(n.data.estimatedTime, n.data.estimatedTimeUnit);
+      }
+    });
+    
+    // Add own time
+    if (node.data.estimatedTime) {
+      ancestorSum += convertToDays(node.data.estimatedTime, node.data.estimatedTimeUnit);
+    }
+    
+    if (ancestorSum > 0 || ancestorMin > 0) {
+      cumulativeTimes.set(ancestorId, { sum: ancestorSum, min: ancestorMin });
     }
   });
   
-  // Topological traversal: process nodes level by level
-  // Keep processing until no new nodes are added
-  let changed = true;
-  const maxIterations = 100; // Prevent infinite loops
-  let iterations = 0;
-  
-  while (changed && iterations < maxIterations) {
-    changed = false;
-    iterations++;
-    
-    // For each node, check if all its dependencies have been processed
-    nodes.forEach(node => {
-      // Skip if not in the ancestor set (not in dependency path to selected node)
-      if (!ancestors.has(node.id) && node.id !== selectedNodeId) {
-        return;
-      }
-      
-      // Skip done/someday nodes - they should not receive cumulative times
-      if (node.data.status === 'done' || node.data.status === 'someday') {
-        return;
-      }
-      
-      // Skip if already processed
-      if (cumulativeTimes.has(node.id)) {
-        return;
-      }
-      
-      // Get all incoming edges (dependencies)
-      const incomingEdges = edges.filter(edge => edge.target === node.id);
-      
-      // If no dependencies, this should have been initialized already
-      // Skip it now (it's already processed or has no time)
-      if (incomingEdges.length === 0) {
-        return;
-      }
-      
-      // Check if all dependencies have cumulative times or are done/someday
-      const dependencyTimes = incomingEdges
-        .map(edge => {
-          const depTime = cumulativeTimes.get(edge.source);
-          if (depTime !== undefined) {
-            return depTime;
-          }
-          
-          // If dependency is 'done' or 'someday', it doesn't contribute to time (already complete or not blocking)
-          const depNode = nodes.find(n => n.id === edge.source);
-          if (depNode && (depNode.data.status === 'done' || depNode.data.status === 'someday')) {
-            return { sum: 0, min: 0 };
-          }
-          
-          return undefined;
-        })
-        .filter(time => time !== undefined);
-      
-      // If not all dependencies are ready, skip
-      if (dependencyTimes.length !== incomingEdges.length) {
-        return;
-      }
-      
-      // Calculate sum and min from dependencies
-      const sumOfSums = dependencyTimes.reduce((acc, time) => acc + time.sum, 0);
-      const maxOfMins = Math.max(...dependencyTimes.map(time => time.min));
-      
-      // Add own time if this node has estimated time
-      // If node has no estimated time, don't add it to cumulativeTimes (acts as barrier)
-      if (!node.data.estimatedTime) {
-        return;
-      }
-      
-      const ownTime = convertToDays(node.data.estimatedTime, node.data.estimatedTimeUnit);
-      
-      cumulativeTimes.set(node.id, {
-        sum: sumOfSums + ownTime,
-        min: maxOfMins + ownTime,
-      });
-      
-      changed = true;
-    });
-  }
   return cumulativeTimes;
 };
