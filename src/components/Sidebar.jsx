@@ -362,7 +362,7 @@ const Sidebar = ({ onMinimize }) => {
         {/* Note */}
         <div className="space-y-1.5">
           <label className="block text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-            Private Notes
+            Notes
           </label>
           <textarea
             name="note"
@@ -370,7 +370,7 @@ const Sidebar = ({ onMinimize }) => {
             onChange={handleChange}
             rows={3}
             className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none shadow-sm text-sm text-gray-600 dark:text-gray-400 leading-relaxed"
-            placeholder="Add private notes..."
+            placeholder="Add notes..."
           />
         </div>
       </div>
