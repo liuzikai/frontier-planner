@@ -8,6 +8,7 @@ const Sidebar = ({ onMinimize }) => {
     description: '',
     status: 'todo',
     primaryTag: null,
+    tags: [],
     estimatedTime: '',
     estimatedTimeUnit: 'days',
     note: '',
@@ -66,6 +67,27 @@ const Sidebar = ({ onMinimize }) => {
     }
   }, [selectedNode, updateTask]);
 
+  const handleAdditionalTagAdd = useCallback((tagId) => {
+    if (!tagId) return;
+    setFormData((prev) => {
+      const newTags = [tagId, ...(prev.tags || [])].filter((val, index, self) => self.indexOf(val) === index);
+      if (selectedNode) {
+        updateTask(selectedNode, { tags: newTags });
+      }
+      return { ...prev, tags: newTags };
+    });
+  }, [selectedNode, updateTask]);
+
+  const handleAdditionalTagRemove = useCallback((tagId) => {
+    setFormData((prev) => {
+      const newTags = (prev.tags || []).filter(id => id !== tagId);
+      if (selectedNode) {
+        updateTask(selectedNode, { tags: newTags });
+      }
+      return { ...prev, tags: newTags };
+    });
+  }, [selectedNode, updateTask]);
+
   const handleTimeUnitChange = useCallback((unit) => {
     setFormData((prev) => ({ ...prev, estimatedTimeUnit: unit }));
     if (selectedNode) {
@@ -84,6 +106,7 @@ const Sidebar = ({ onMinimize }) => {
         description: selectedNodeData.data.description || '',
         status: selectedNodeData.data.status || 'todo',
         primaryTag: selectedNodeData.data.primaryTag || null,
+        tags: selectedNodeData.data.tags || [],
         estimatedTime: selectedNodeData.data.estimatedTime || '',
         estimatedTimeUnit: selectedNodeData.data.estimatedTimeUnit || 'days',
         note: selectedNodeData.data.note || '',
@@ -317,6 +340,57 @@ const Sidebar = ({ onMinimize }) => {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
+            </div>
+          </div>
+        </div>
+
+        {/* Additional Tags */}
+        <div className="space-y-1.5">
+          <label className="block text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+            Additional Tags
+          </label>
+          <div className="flex flex-wrap gap-2 mb-1">
+            {(formData.tags || []).filter(tId => tId !== formData.primaryTag).map(tagId => {
+              const tag = tags.find(t => t.id === tagId);
+              if (!tag) return null;
+              return (
+                <div key={tag.id} 
+                  className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg border shadow-sm text-xs font-bold transition-all hover:scale-105"
+                  style={{ backgroundColor: `${tag.color}15`, borderColor: `${tag.color}40`, color: tag.color }}
+                >
+                  <span>{tag.name}</span>
+                  <button 
+                    onClick={() => handleAdditionalTagRemove(tag.id)} 
+                    className="hover:bg-black/10 dark:hover:bg-white/10 rounded-full p-0.5 transition-colors"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+              );
+            })}
+            
+            <div className="relative">
+              <select
+                 onChange={(e) => {
+                     handleAdditionalTagAdd(e.target.value);
+                     e.target.value = '';
+                 }}
+                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              >
+                 <option value="">Add Tag</option>
+                 {tags.filter(t => t.id !== formData.primaryTag && !(formData.tags || []).includes(t.id)).map((tag) => (
+                     <option key={tag.id} value={tag.id}>
+                         {tag.name}
+                     </option>
+                 ))}
+              </select>
+              <div className="flex items-center justify-center px-2 py-1.5 h-full rounded-lg border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-blue-500 hover:border-blue-500 dark:hover:text-blue-400 dark:hover:border-blue-400 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                </svg>
+              </div>
             </div>
           </div>
         </div>

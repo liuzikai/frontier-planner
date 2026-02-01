@@ -94,6 +94,22 @@ const TaskNode = ({ id, data, selected }) => {
                   {primaryTag.name}
                 </span>
               )}
+              {data.tags && data.tags.filter(tagId => tagId !== data.primaryTag).map(tagId => {
+                const tag = tags.find(t => t.id === tagId);
+                if (!tag) return null;
+                return (
+                  <span
+                    key={tag.id}
+                    className="inline-block text-[9px] px-1.5 py-0.5 rounded-full font-bold text-gray-800 dark:text-gray-200 border shadow-sm"
+                    style={{ 
+                      backgroundColor: `${tag.color}20`,
+                      borderColor: `${tag.color}50`,
+                    }}
+                  >
+                    {tag.name}
+                  </span>
+                );
+              })}
               <span className="inline-block text-[9px] px-1.5 py-0.5 rounded-full font-bold bg-white/50 dark:bg-black/20 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 shadow-sm">
                 {statusLabels[data.status]}
               </span>
