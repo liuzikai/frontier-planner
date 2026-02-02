@@ -162,7 +162,10 @@ const TaskNode = ({ id, data, selected }) => {
             <div className="bg-orange-500 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-xl shadow-xl cursor-help animate-in fade-in zoom-in duration-200">
               {data.cumulativeTime.sum === data.cumulativeTime.min ? (
                 // Single time (frontier or equal)
-                <div>{formatTime(data.cumulativeTime.sum)}</div>
+                <div className="flex items-center gap-1.5">
+                    <span className="opacity-70 font-mono">Σ</span>
+                    <span>{formatTime(data.cumulativeTime.sum)}</span>
+                </div>
               ) : (
                 // Two times (sum and min)
                 <div className="text-left leading-tight">
