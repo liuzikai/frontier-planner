@@ -636,6 +636,7 @@ export const useStore = create(
       {
         partialize: (state) => ({ nodes: state.nodes, edges: state.edges }),
         limit: 50,
+        equality: (a, b) => a.nodes === b.nodes && a.edges === b.edges,
       }
     ),
     {
