@@ -16,7 +16,7 @@ function App() {
 
   return (
     <ReactFlowProvider>
-      <div className="w-full h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
+      <div className="w-full h-dvh bg-white dark:bg-gray-900 transition-colors duration-300">
         <Canvas />
       </div>
     </ReactFlowProvider>
