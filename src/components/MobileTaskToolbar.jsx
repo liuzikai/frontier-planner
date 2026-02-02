@@ -49,7 +49,7 @@ const MobileTaskToolbar = () => {
   };
 
   return (
-    <div className="md:hidden fixed bottom-4 right-4 z-30 flex items-center gap-2">
+    <div className="md:hidden fixed bottom-[10px] right-[10px] z-30 flex items-center gap-2">
       {/* Undo/Redo Group */}
       <div className="flex bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full shadow-lg border border-gray-200 dark:border-gray-700 p-1">
         <button

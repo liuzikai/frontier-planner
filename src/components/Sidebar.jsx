@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useReactFlow } from '@xyflow/react';
 import { useStore } from '../store/useStore';
 
 const Sidebar = ({ onMinimize }) => {
   const { nodes, selectedNode, updateTask, setSelectedNode, tags, mobileEditOpen, setMobileEditOpen } = useStore();
+  const { setCenter } = useReactFlow();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -28,8 +30,27 @@ const Sidebar = ({ onMinimize }) => {
   }, []);
 
   useEffect(() => {
-    adjustTitleHeight();
-  }, [formData.title, selectedNode, adjustTitleHeight]);
+    // Small timeout to ensure the element is rendered and has dimensions
+    const timer = setTimeout(adjustTitleHeight, 50);
+    return () => clearTimeout(timer);
+  }, [formData.title, selectedNode, mobileEditOpen, adjustTitleHeight]);
+
+  // Center node in the visible area above the mobile panel
+  const lastCenteredNodeRef = useRef(null);
+  useEffect(() => {
+    if (mobileEditOpen && selectedNode && lastCenteredNodeRef.current !== selectedNode) {
+      const node = nodes.find(n => n.id === selectedNode);
+      if (node) {
+        const x = node.position.x + (node.measured?.width || 150) / 2;
+        const y = node.position.y + (node.measured?.height || 60) / 2;
+        
+        setCenter(x, y + window.innerHeight * 0.4, { zoom: 0.8, duration: 800, offset: { x: 0, y: 0 } });
+        lastCenteredNodeRef.current = selectedNode;
+      }
+    } else if (!mobileEditOpen) {
+      lastCenteredNodeRef.current = null;
+    }
+  }, [mobileEditOpen, selectedNode, setCenter, nodes]);
 
   // All hooks must be called before any conditional returns
   const handleChange = useCallback((e) => {
@@ -243,8 +264,8 @@ const Sidebar = ({ onMinimize }) => {
 
   return (
     <div className={`
-      ${mobileEditOpen ? 'fixed inset-0 w-full z-50 flex' : 'hidden md:flex w-80 z-20'} 
-      bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-2xl flex-col
+      ${mobileEditOpen ? 'fixed bottom-0 left-0 right-0 h-[75vh] z-50 flex shadow-[0_-8px_30px_rgb(0,0,0,0.12)] rounded-t-3xl' : 'hidden md:flex w-80 z-20'} 
+      bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex-col
     `}>
       {/* Header */}
       <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
@@ -273,7 +294,7 @@ const Sidebar = ({ onMinimize }) => {
             value={formData.title}
             onChange={handleChange}
             rows={1}
-            className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm text-sm font-bold text-gray-800 dark:text-gray-100 resize-none overflow-hidden leading-relaxed"
+            className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm text-sm font-bold text-gray-800 dark:text-gray-100 resize-none overflow-hidden leading-relaxed min-h-[42px]"
             placeholder="Enter task title..."
           />
         </div>
