@@ -122,8 +122,8 @@ const Canvas = () => {
     }
   }, [lastLoadedAt, reactFlowInstance, clearHistory]);
 
-  // MiniMap visibility state
-  const [showMiniMap, setShowMiniMap] = useState(true);
+  // MiniMap visibility state (hidden by default on mobile)
+  const [showMiniMap, setShowMiniMap] = useState(window.innerWidth > 768);
   
   // Sidebar minimize state (persists until a node is selected)
   const [sidebarMinimized, setSidebarMinimized] = useState(false);

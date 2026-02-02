@@ -251,7 +251,7 @@ export const useStore = create(
         darkMode: false,
         selectionMode: 'pan', // 'pan' or 'select'
         colorMode: 'status', // 'status' or 'tag'
-        animationsEnabled: true,
+        animationsEnabled: typeof window !== 'undefined' && window.innerWidth > 768,
         mobileEditOpen: false,
         _preDragNodes: null,
 

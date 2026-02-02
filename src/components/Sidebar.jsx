@@ -472,11 +472,9 @@ const Sidebar = ({ onMinimize }) => {
             placeholder="Add notes..."
           />
         </div>
-      </div>
 
-      {/* Footer with creation date */}
-      <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50/30 dark:bg-transparent">
-        <div className="flex items-center justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+        {/* Creation Date (Internalized on mobile to save space) */}
+        <div className="pt-4 border-t border-gray-100 dark:border-gray-700/50 flex items-center justify-between text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
           <span>Created</span>
           <span>{new Date(selectedNodeData.data.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
         </div>
