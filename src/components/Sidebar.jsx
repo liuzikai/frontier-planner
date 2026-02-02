@@ -264,7 +264,7 @@ const Sidebar = ({ onMinimize }) => {
 
   return (
     <div className={`
-      ${mobileEditOpen ? 'fixed bottom-0 left-0 right-0 h-[75vh] z-50 flex shadow-[0_-8px_30px_rgb(0,0,0,0.12)] rounded-t-3xl' : 'hidden md:flex w-80 z-20'} 
+      ${mobileEditOpen ? 'fixed bottom-0 left-0 right-0 h-[75dvh] z-50 flex shadow-[0_-8px_30px_rgb(0,0,0,0.12)] rounded-t-3xl' : 'hidden md:flex w-80 z-20'} 
       bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex-col
     `}>
       {/* Header */}
