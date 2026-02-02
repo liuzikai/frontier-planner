@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useStore } from '../store/useStore';
 
 const Sidebar = ({ onMinimize }) => {
-  const { nodes, selectedNode, updateTask, setSelectedNode, tags } = useStore();
+  const { nodes, selectedNode, updateTask, setSelectedNode, tags, mobileEditOpen, setMobileEditOpen } = useStore();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -97,7 +97,8 @@ const Sidebar = ({ onMinimize }) => {
 
   const handleClose = useCallback(() => {
     setSelectedNode(null);
-  }, [setSelectedNode]);
+    setMobileEditOpen(false);
+  }, [setSelectedNode, setMobileEditOpen]);
 
   useEffect(() => {
     if (selectedNodeData) {
@@ -131,7 +132,7 @@ const Sidebar = ({ onMinimize }) => {
   // Show welcome panel if no node is selected
   if (!selectedNode) {
     return (
-      <div className="w-80 h-screen bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-2xl flex flex-col z-20">
+      <div className="hidden md:flex w-80 h-screen bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-2xl flex-col z-20">
         {/* Header with minimize button */}
         <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
           <h2 className="font-bold text-gray-900 dark:text-gray-100 tracking-tight">Frontier Planner</h2>
@@ -229,7 +230,7 @@ const Sidebar = ({ onMinimize }) => {
   // Show task details if node is selected and data exists
   if (!selectedNode || !selectedNodeData) {
     return (
-      <div className="w-80 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 p-8 flex flex-col items-center justify-center text-gray-400 z-20">
+      <div className="hidden md:flex w-80 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 p-8 flex-col items-center justify-center text-gray-400 z-20">
         <div className="w-20 h-20 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6 border border-gray-100 dark:border-gray-700 shadow-inner">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-300 dark:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -241,7 +242,10 @@ const Sidebar = ({ onMinimize }) => {
   }
 
   return (
-    <div className="w-80 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-2xl flex flex-col z-20">
+    <div className={`
+      ${mobileEditOpen ? 'fixed inset-0 w-full z-50 flex' : 'hidden md:flex w-80 z-20'} 
+      bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-2xl flex-col
+    `}>
       {/* Header */}
       <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
         <h2 className="font-bold text-gray-900 dark:text-gray-100 tracking-tight">Task Details</h2>

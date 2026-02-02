@@ -49,6 +49,13 @@ html, body, #root {
   fill: #9ca3af !important;
 }
 
+/* Hide React Flow attribution on mobile to save space */
+@media (max-width: 768px) {
+  .react-flow__attribution {
+    display: none !important;
+  }
+}
+
 .dark .react-flow__controls-button:hover {
   background-color: #374151 !important; /* gray-700 */
 }

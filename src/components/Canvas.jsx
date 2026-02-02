@@ -12,6 +12,7 @@ import { useStore, useTemporalStore } from '../store/useStore';
 import TaskNode from './TaskNode';
 import Toolbar from './Toolbar';
 import Sidebar from './Sidebar';
+import MobileTaskToolbar from './MobileTaskToolbar';
 import { findFrontierTasks } from '../utils/frontierUtils';
 import { calculateCumulativeTimes } from '../utils/timeUtils';
 
@@ -345,7 +346,10 @@ const Canvas = () => {
             size={1}
             color={darkMode ? '#374151' : '#e5e7eb'}
           />
-          <Controls className="!bg-white dark:!bg-gray-800 !rounded-xl !shadow-xl !border !border-gray-200 dark:!border-gray-700 !overflow-hidden">
+          <Controls 
+            showInteractive={false}
+            className="!bg-white dark:!bg-gray-800 !rounded-xl !shadow-xl !border !border-gray-200 dark:!border-gray-700 !overflow-hidden"
+          >
             <ControlButton
               onClick={() => setColorMode(colorMode === 'status' ? 'tag' : 'status')}
               title={colorMode === 'status' ? 'Switch to Tag Coloring' : 'Switch to Status Coloring'}
@@ -423,6 +427,9 @@ const Canvas = () => {
       {!sidebarMinimized && selectedNodes.length <= 1 && (
         <Sidebar onMinimize={() => setSidebarMinimized(true)} />
       )}
+
+      {/* Mobile-only task action bar */}
+      <MobileTaskToolbar />
     </div>
   );
 };

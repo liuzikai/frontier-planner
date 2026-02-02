@@ -100,12 +100,12 @@ const Toolbar = ({ getViewportCenter }) => {
   };
 
   return (
-    <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
+    <div className="absolute top-4 left-4 z-10 flex flex-wrap items-center gap-2 max-w-[calc(100vw-2rem)]">
       {/* File Operations */}
       <div className="flex items-center bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
         <button
           onClick={handleNew}
-          className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-r border-gray-200 dark:border-gray-700"
+          className="hidden md:block p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-r border-gray-200 dark:border-gray-700"
           title="New Canvas"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -131,7 +131,7 @@ const Toolbar = ({ getViewportCenter }) => {
           <>
             <button
               onClick={handleSave}
-              className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-r border-gray-200 dark:border-gray-700 relative"
+              className="hidden md:flex p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-r border-gray-200 dark:border-gray-700 relative"
               title="Save (Ctrl+S)"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -145,7 +145,7 @@ const Toolbar = ({ getViewportCenter }) => {
             </button>
             <button
               onClick={handleSaveAs}
-              className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              className="hidden md:block p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               title="Save As..."
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -156,6 +156,21 @@ const Toolbar = ({ getViewportCenter }) => {
                 <line x1="18" y1="16" x2="18" y2="20"></line>
                 <line x1="16" y1="18" x2="20" y2="18"></line>
               </svg>
+            </button>
+            {/* Mobile Fallback Save (Download) when native is supported but we want mobile consistency */}
+            <button
+              onClick={handleSave}
+              className="md:hidden p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors relative"
+              title="Download Canvas"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              {isDirty && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-orange-500 rounded-full border border-white dark:border-gray-800" />
+              )}
             </button>
           </>
         ) : (
@@ -177,44 +192,46 @@ const Toolbar = ({ getViewportCenter }) => {
       </div>
 
       {/* Divider */}
-      <div className="w-px h-8 bg-gray-300 dark:bg-gray-700 mx-1" />
+      <div className="hidden md:block w-px h-8 bg-gray-300 dark:bg-gray-700 mx-1" />
 
       {/* Undo/Redo */}
-      <button
-        onClick={() => undo()}
-        disabled={!canUndo}
-        className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all shadow-xl border border-gray-200 dark:border-gray-700 active:scale-95 ${
-          canUndo
-            ? 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-            : 'bg-gray-50 dark:bg-gray-800/50 text-gray-300 dark:text-gray-700 cursor-not-allowed'
-        }`}
-        title="Undo (Ctrl+Z)"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a2 2 0 012 2v4a1 1 0 11-2 0v-4H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
-        </svg>
-      </button>
+      <div className="hidden md:flex items-center gap-2">
+        <button
+          onClick={() => undo()}
+          disabled={!canUndo}
+          className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all shadow-xl border border-gray-200 dark:border-gray-700 active:scale-95 ${
+            canUndo
+              ? 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+              : 'bg-gray-50 dark:bg-gray-800/50 text-gray-300 dark:text-gray-700 cursor-not-allowed'
+          }`}
+          title="Undo (Ctrl+Z)"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a2 2 0 012 2v4a1 1 0 11-2 0v-4H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
+          </svg>
+        </button>
 
-      <button
-        onClick={() => redo()}
-        disabled={!canRedo}
-        className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all shadow-xl border border-gray-200 dark:border-gray-700 active:scale-95 ${
-          canRedo
-            ? 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-            : 'bg-gray-50 dark:bg-gray-800/50 text-gray-300 dark:text-gray-700 cursor-not-allowed'
-        }`}
-        title="Redo (Ctrl+Alt+Z)"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M10.293 14.707a1 1 0 001.414 0l4-4a1 1 0 000-1.414l-4-4a1 1 0 00-1.414 1.414L12.586 9H5a2 2 0 00-2 2v4a1 1 0 102 0v-4h7.586l-2.293 2.293a1 1 0 000 1.414z" clipRule="evenodd" />
-        </svg>
-      </button>
+        <button
+          onClick={() => redo()}
+          disabled={!canRedo}
+          className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all shadow-xl border border-gray-200 dark:border-gray-700 active:scale-95 ${
+            canRedo
+              ? 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+              : 'bg-gray-50 dark:bg-gray-800/50 text-gray-300 dark:text-gray-700 cursor-not-allowed'
+          }`}
+          title="Redo (Ctrl+Alt+Z)"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M10.293 14.707a1 1 0 001.414 0l4-4a1 1 0 000-1.414l-4-4a1 1 0 00-1.414 1.414L12.586 9H5a2 2 0 00-2 2v4a1 1 0 102 0v-4h7.586l-2.293 2.293a1 1 0 000 1.414z" clipRule="evenodd" />
+          </svg>
+        </button>
+      </div>
 
       {/* Divider */}
-      <div className="w-px h-8 bg-gray-300 dark:bg-gray-700 mx-1" />
+      <div className="hidden md:block w-px h-8 bg-gray-300 dark:bg-gray-700 mx-1" />
 
       {/* Selection Mode Toggle */}
-      <div className="flex bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="hidden md:flex bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
         <button
           onClick={() => setSelectionMode('pan')}
           className={`p-2 transition-colors border-r border-gray-200 dark:border-gray-700 ${
@@ -249,12 +266,12 @@ const Toolbar = ({ getViewportCenter }) => {
       </div>
 
       {/* Divider */}
-      <div className="w-px h-8 bg-gray-300 dark:bg-gray-700 mx-1" />
+      <div className="hidden md:block w-px h-8 bg-gray-300 dark:bg-gray-700 mx-1" />
 
       {/* Add Task Button */}
       <button
         onClick={handleAddTask}
-        className="flex items-center gap-2 px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all shadow-xl font-bold active:scale-95"
+        className="hidden md:flex items-center gap-2 px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all shadow-xl font-bold active:scale-95"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
           <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
@@ -263,7 +280,7 @@ const Toolbar = ({ getViewportCenter }) => {
       </button>
 
       {/* Divider */}
-      <div className="w-px h-8 bg-gray-300 dark:bg-gray-700 mx-1" />
+      <div className="hidden md:block w-px h-8 bg-gray-300 dark:bg-gray-700 mx-1" />
 
       {/* Manage Tags Button */}
       <button
@@ -277,7 +294,7 @@ const Toolbar = ({ getViewportCenter }) => {
       </button>
 
       {/* Divider */}
-      <div className="w-px h-8 bg-gray-300 dark:bg-gray-700 mx-1" />
+      <div className="hidden md:block w-px h-8 bg-gray-300 dark:bg-gray-700 mx-1" />
 
       {/* Current File Name */}
       {currentFileName && (
@@ -286,7 +303,7 @@ const Toolbar = ({ getViewportCenter }) => {
             ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-700 text-orange-700 dark:text-orange-400' 
             : 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-400'
         }`}>
-          <span className="max-w-[150px] truncate">{currentFileName}</span>
+          <span className="max-w-[100px] md:max-w-[150px] truncate">{currentFileName}</span>
           {isDirty && <span className={`w-1.5 h-1.5 bg-orange-500 rounded-full ${animationsEnabled ? 'animate-pulse' : ''}`} />}
         </div>
       )}

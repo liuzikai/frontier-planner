@@ -252,9 +252,11 @@ export const useStore = create(
         selectionMode: 'pan', // 'pan' or 'select'
         colorMode: 'status', // 'status' or 'tag'
         animationsEnabled: true,
+        mobileEditOpen: false,
         _preDragNodes: null,
 
         // Actions
+        setMobileEditOpen: (open) => set({ mobileEditOpen: open }),
         toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
         setSelectionMode: (mode) => set({ selectionMode: mode }),
         setColorMode: (mode) => set({ colorMode: mode }),
