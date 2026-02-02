@@ -363,10 +363,10 @@ const Canvas = () => {
             </ControlButton>
             <ControlButton
               onClick={toggleAnimations}
-              title={animationsEnabled ? 'Disable Animations' : 'Enable Animations'}
+              title={animationsEnabled ? 'Disable Animations' : 'Enable Animations (rendering consumes energy!)'}
               className={!animationsEnabled
-                ? '!bg-blue-50 dark:!bg-blue-900/40 !text-blue-600 dark:!text-blue-400 !border-none'
-                : '!bg-white dark:!bg-gray-800 !text-gray-600 dark:!text-gray-400 hover:!bg-gray-50 dark:hover:!bg-gray-700 !border-none'}
+                ? '!bg-white dark:!bg-gray-800 !text-gray-600 dark:!text-gray-400 hover:!bg-gray-50 dark:hover:!bg-gray-700 !border-none'
+                : '!bg-blue-50 dark:!bg-blue-900/40 !text-blue-600 dark:!text-blue-400 !border-none'}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
