@@ -306,7 +306,7 @@ const Canvas = () => {
   );
 
   return (
-    <div className={`flex h-full w-full ${selectionMode === 'select' ? 'selection-mode' : 'pan-mode'}`}>
+    <div className={`flex h-dvh w-full ${selectionMode === 'select' ? 'selection-mode' : 'pan-mode'}`}>
       {/* Main Canvas */}
       <div className="flex-1 relative">
         <Toolbar getViewportCenter={getViewportCenter} />
