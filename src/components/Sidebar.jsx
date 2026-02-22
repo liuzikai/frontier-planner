@@ -153,7 +153,7 @@ const Sidebar = ({ onMinimize }) => {
   // Show welcome panel if no node is selected
   if (!selectedNode) {
     return (
-      <div className="hidden md:flex w-80 h-screen bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-2xl flex-col z-20">
+      <div className="hidden md:flex w-80 h-dvh bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-2xl flex-col z-20">
         {/* Header with minimize button */}
         <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
           <h2 className="font-bold text-gray-900 dark:text-gray-100 tracking-tight">Frontier Planner</h2>
