@@ -200,8 +200,9 @@ const initialNodes = [
   {
     id: 'group-1',
     type: 'groupNode',
-    position: { x: 1200, y: 150 },
-    measured: { width: 300, height: 200 },
+    // position = minChild(x,y) - (GROUP_PADDING, GROUP_HEADER + GROUP_PADDING)
+    // task-9 at (1250, 237) → (1250-30, 237-44-30) = (1220, 163)
+    position: { x: 1220, y: 163 },
     data: {
       title: 'Release Group',
       isCollapsed: false,
@@ -406,7 +407,9 @@ export const useStore = create(
           const minX = Math.min(...targetNodes.map(n => n.position.x));
           const minY = Math.min(...targetNodes.map(n => n.position.y));
 
-          const groupNode = createDefaultGroup({ x: minX, y: minY }, title);
+          const GROUP_PADDING = 30;
+          const GROUP_HEADER = 44;
+          const groupNode = createDefaultGroup({ x: minX - GROUP_PADDING, y: minY - GROUP_HEADER - GROUP_PADDING }, title);
 
           set({
             nodes: [
@@ -441,13 +444,58 @@ export const useStore = create(
         },
 
         toggleGroupCollapsed: (groupId) => {
+          const GROUP_PADDING = 30;
+          const GROUP_HEADER = 44;
+          const nodes = get().nodes;
+          const groupNode = nodes.find(n => n.id === groupId);
+          if (!groupNode) return;
+
+          const willCollapse = !groupNode.data.isCollapsed;
+          const children = nodes.filter(n => n.data.parentId === groupId);
+
+          let updatedNodes = nodes.map(n =>
+            n.id === groupId
+              ? { ...n, data: { ...n.data, isCollapsed: willCollapse } }
+              : n
+          );
+
+          if (children.length > 0) {
+            const minX = Math.min(...children.map(n => n.position.x));
+            const minY = Math.min(...children.map(n => n.position.y));
+            // The canonical group position derived from current children layout
+            const childrenBasedPos = { x: minX - GROUP_PADDING, y: minY - GROUP_HEADER - GROUP_PADDING };
+
+            if (willCollapse) {
+              // Save computed position so collapsed group appears over children
+              updatedNodes = updatedNodes.map(n =>
+                n.id === groupId ? { ...n, position: childrenBasedPos } : n
+              );
+            } else {
+              // On expand: move children to align with the group's current stored position
+              // (handles case where collapsed group was dragged)
+              const dx = groupNode.position.x - childrenBasedPos.x;
+              const dy = groupNode.position.y - childrenBasedPos.y;
+              if (dx !== 0 || dy !== 0) {
+                updatedNodes = updatedNodes.map(n =>
+                  n.data.parentId === groupId
+                    ? { ...n, position: { x: n.position.x + dx, y: n.position.y + dy } }
+                    : n
+                );
+              }
+            }
+          }
+
+          set({ nodes: updatedNodes, isDirty: true });
+        },
+
+        moveGroupChildren: (groupId, dx, dy) => {
+          // Called during drag — temporal is already paused by onNodeDragStart
           set({
             nodes: get().nodes.map(n =>
-              n.id === groupId
-                ? { ...n, data: { ...n.data, isCollapsed: !n.data.isCollapsed } }
+              n.data.parentId === groupId
+                ? { ...n, position: { x: n.position.x + dx, y: n.position.y + dy } }
                 : n
             ),
-            isDirty: true,
           });
         },
 
@@ -566,11 +614,27 @@ export const useStore = create(
           const preDrag = get()._preDragNodes;
           const current = get().nodes;
           const changed = preDrag && JSON.stringify(preDrag) !== JSON.stringify(current);
-          
+
           if (changed) {
+            // For collapsed groups that were dragged, also move their children by the same delta
+            let adjustedNodes = current;
+            current.forEach(node => {
+              if (node.type !== 'groupNode' || !node.data.isCollapsed) return;
+              const preDragNode = preDrag.find(n => n.id === node.id);
+              if (!preDragNode) return;
+              const dx = node.position.x - preDragNode.position.x;
+              const dy = node.position.y - preDragNode.position.y;
+              if (dx === 0 && dy === 0) return;
+              adjustedNodes = adjustedNodes.map(n =>
+                n.data.parentId === node.id
+                  ? { ...n, position: { x: n.position.x + dx, y: n.position.y + dy } }
+                  : n
+              );
+            });
+
             set({ _preDragNodes: null, nodes: preDrag });
             useStore.temporal.getState().resume();
-            set({ nodes: current, isDirty: true });
+            set({ nodes: adjustedNodes, isDirty: true });
           } else {
             set({ _preDragNodes: null });
             useStore.temporal.getState().resume();

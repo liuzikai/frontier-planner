@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useCallback, useEffect, useState, useMemo, useRef } from 'react';
 import {
   ReactFlow,
   Controls,
@@ -56,7 +56,8 @@ const Canvas = () => {
     colorMode,
     setColorMode,
     animationsEnabled,
-    toggleAnimations
+    toggleAnimations,
+    moveGroupChildren
   } = useStore();
 
   const undo = useTemporalStore((state) => state.undo);
@@ -124,6 +125,9 @@ const Canvas = () => {
     }
   }, [lastLoadedAt, reactFlowInstance, clearHistory]);
 
+  // Group drag tracking: record position per group at drag-start, compute delta in onNodeDrag
+  const lastGroupDragPos = useRef({});
+
   // MiniMap visibility state (hidden by default on mobile)
   const [showMiniMap, setShowMiniMap] = useState(window.innerWidth > 768);
   
@@ -188,12 +192,12 @@ const Canvas = () => {
     return calculateCumulativeTimes(selectedNode, frontierTasks, nodes, edges);
   }, [selectedNode, selectedNodes, frontierTasks, nodes, edges]);
 
+  // GROUP_PADDING matches the value used in useStore.js group actions
+  const GROUP_PADDING = 30;
+
   // Sync our selectedNodes with React Flow's selection state and add frontier info
   // Frontier info shown for all selected nodes; time info only for single selection
   const nodesWithSelection = useMemo(() => {
-    const GROUP_PADDING = 30;
-    const GROUP_HEADER = 44; // px reserved for the title header strip
-
     // Filter out nodes whose parent group is collapsed
     const visibleNodes = nodes.filter(node => {
       if (!node.data.parentId) return true;
@@ -207,42 +211,40 @@ const Canvas = () => {
         const zIndex = node.selected ? 10010 : 10; // always behind task nodes
 
         if (isCollapsed) {
-          // Fixed collapsed pill size
           return {
             ...node,
             zIndex,
-            draggable: false,
+            draggable: true,
             style: { width: 200, height: 70 },
             data: { ...node.data, isFrontier: frontierTasks.has(node.id) },
           };
         }
 
-        // Expanded: auto-size to cover children
+        // Expanded: use stored position as the group's top-left anchor;
+        // expand the size rightward/downward to cover all children.
+        // The stored position is kept canonical so the group is freely draggable.
         const children = nodes.filter(n => n.data.parentId === node.id);
         if (children.length > 0) {
-          const minX = Math.min(...children.map(n => n.position.x));
-          const minY = Math.min(...children.map(n => n.position.y));
-          const maxX = Math.max(...children.map(n => n.position.x + (n.measured?.width ?? 200)));
-          const maxY = Math.max(...children.map(n => n.position.y + (n.measured?.height ?? 80)));
-
+          const maxRight  = Math.max(...children.map(n => n.position.x + (n.measured?.width  ?? 200)));
+          const maxBottom = Math.max(...children.map(n => n.position.y + (n.measured?.height ?? 80)));
           return {
             ...node,
-            position: { x: minX - GROUP_PADDING, y: minY - GROUP_PADDING - GROUP_HEADER },
+            // position NOT overridden — stored position is the source of truth
             style: {
-              width: maxX - minX + GROUP_PADDING * 2,
-              height: maxY - minY + GROUP_PADDING * 2 + GROUP_HEADER,
+              width:  Math.max(220, maxRight  - node.position.x + GROUP_PADDING),
+              height: Math.max(130, maxBottom - node.position.y + GROUP_PADDING),
             },
             zIndex,
-            draggable: false,
+            draggable: true,
             data: { ...node.data, isFrontier: frontierTasks.has(node.id) },
           };
         }
 
-        // Group with no children: show a placeholder size
+        // Group with no children yet
         return {
           ...node,
           zIndex,
-          draggable: false,
+          draggable: true,
           style: { width: 220, height: 120 },
           data: { ...node.data, isFrontier: frontierTasks.has(node.id) },
         };
@@ -313,6 +315,31 @@ const Canvas = () => {
       };
     }).filter(Boolean);
   }, [edges, nodes, darkMode, animationsEnabled]);
+
+  // Wrap drag callbacks to track group node drag positions for real-time child movement
+  const handleNodeDragStart = useCallback((event, node) => {
+    onNodeDragStart();
+    if (node.type === 'groupNode' && !node.data.isCollapsed) {
+      lastGroupDragPos.current[node.id] = { x: node.position.x, y: node.position.y };
+    }
+  }, [onNodeDragStart]);
+
+  const handleNodeDrag = useCallback((event, node) => {
+    if (node.type !== 'groupNode' || node.data.isCollapsed) return;
+    const last = lastGroupDragPos.current[node.id];
+    if (!last) return;
+    const dx = node.position.x - last.x;
+    const dy = node.position.y - last.y;
+    if (dx !== 0 || dy !== 0) {
+      moveGroupChildren(node.id, dx, dy);
+      lastGroupDragPos.current[node.id] = { x: node.position.x, y: node.position.y };
+    }
+  }, [moveGroupChildren]);
+
+  const handleNodeDragStop = useCallback(() => {
+    onNodeDragStop();
+    lastGroupDragPos.current = {};
+  }, [onNodeDragStop]);
 
   // Get center of current viewport for adding new tasks
   const getViewportCenter = useCallback(() => {
@@ -403,8 +430,9 @@ const Canvas = () => {
           onEdgeClick={handleEdgeClick}
           onNodeClick={handleNodeClick}
           onDoubleClick={handlePaneDoubleClick}
-          onNodeDragStart={onNodeDragStart}
-          onNodeDragStop={onNodeDragStop}
+          onNodeDragStart={handleNodeDragStart}
+          onNodeDrag={handleNodeDrag}
+          onNodeDragStop={handleNodeDragStop}
           nodeTypes={nodeTypes}
           defaultEdgeOptions={defaultEdgeOptions}
           fitView
