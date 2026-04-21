@@ -32,6 +32,20 @@ const createDefaultTask = (position = { x: 100, y: 100 }) => ({
     estimatedTimeUnit: 'days',
     note: '',
     createdAt: new Date().toISOString(),
+    parentId: null,
+  },
+});
+
+const createDefaultGroup = (position = { x: 100, y: 100 }, title = 'New Group') => ({
+  id: generateId(),
+  type: 'groupNode',
+  position,
+  data: {
+    title,
+    description: '',
+    status: 'todo',
+    isCollapsed: false,
+    createdAt: new Date().toISOString(),
   },
 });
 
@@ -179,6 +193,18 @@ const initialNodes = [
       estimatedTime: 1,
       estimatedTimeUnit: 'days',
       note: 'The final milestone',
+      createdAt: new Date().toISOString(),
+      parentId: 'group-1',
+    },
+  },
+  {
+    id: 'group-1',
+    type: 'groupNode',
+    position: { x: 1200, y: 150 },
+    measured: { width: 300, height: 200 },
+    data: {
+      title: 'Release Group',
+      isCollapsed: false,
       createdAt: new Date().toISOString(),
     },
   },
@@ -364,6 +390,81 @@ export const useStore = create(
           set({
             nodes: get().nodes.map((n) =>
               n.id === id ? { ...n, data: { ...n.data, ...data } } : n
+            ),
+            isDirty: true,
+          });
+        },
+
+        groupSelectedTasks: (title = 'New Group') => {
+          const selectedNodeIds = get().selectedNodes;
+          const nodes = get().nodes;
+          if (selectedNodeIds.length < 2) return;
+
+          // Children keep their absolute positions — the group container auto-sizes around them
+          const targetNodes = nodes.filter(n => selectedNodeIds.includes(n.id) && n.type !== 'groupNode');
+          if (targetNodes.length < 1) return;
+          const minX = Math.min(...targetNodes.map(n => n.position.x));
+          const minY = Math.min(...targetNodes.map(n => n.position.y));
+
+          const groupNode = createDefaultGroup({ x: minX, y: minY }, title);
+
+          set({
+            nodes: [
+              ...nodes.map(n =>
+                selectedNodeIds.includes(n.id) && n.type !== 'groupNode'
+                  ? { ...n, data: { ...n.data, parentId: groupNode.id } }
+                  : n
+              ),
+              groupNode,
+            ],
+            selectedNodes: [groupNode.id],
+            selectedNode: groupNode.id,
+            isDirty: true,
+          });
+        },
+
+        ungroupTasks: (groupId) => {
+          const nodes = get().nodes;
+          if (!nodes.find(n => n.id === groupId && n.type === 'groupNode')) return;
+
+          // Children keep their absolute positions — just clear parentId
+          set({
+            nodes: nodes
+              .filter(n => n.id !== groupId)
+              .map(n =>
+                n.data.parentId === groupId
+                  ? { ...n, data: { ...n.data, parentId: null } }
+                  : n
+              ),
+            isDirty: true,
+          });
+        },
+
+        toggleGroupCollapsed: (groupId) => {
+          set({
+            nodes: get().nodes.map(n =>
+              n.id === groupId
+                ? { ...n, data: { ...n.data, isCollapsed: !n.data.isCollapsed } }
+                : n
+            ),
+            isDirty: true,
+          });
+        },
+
+        addToGroup: (taskId, groupId) => {
+          // Positions are absolute — no transformation needed
+          set({
+            nodes: get().nodes.map(n =>
+              n.id === taskId ? { ...n, data: { ...n.data, parentId: groupId } } : n
+            ),
+            isDirty: true,
+          });
+        },
+
+        removeFromGroup: (taskId) => {
+          set({
+            nodes: get().nodes.map(n =>
+              n.id === taskId ? { ...n, data: { ...n.data, parentId: null } } : n
             ),
             isDirty: true,
           });

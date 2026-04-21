@@ -3,7 +3,7 @@ import { useReactFlow } from '@xyflow/react';
 import { useStore } from '../store/useStore';
 
 const Sidebar = ({ onMinimize }) => {
-  const { nodes, selectedNode, updateTask, setSelectedNode, tags, mobileEditOpen, setMobileEditOpen } = useStore();
+  const { nodes, selectedNode, updateTask, setSelectedNode, tags, mobileEditOpen, setMobileEditOpen, ungroupTasks } = useStore();
   const { setCenter } = useReactFlow();
   const [formData, setFormData] = useState({
     title: '',
@@ -269,7 +269,9 @@ const Sidebar = ({ onMinimize }) => {
     `}>
       {/* Header */}
       <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
-        <h2 className="font-bold text-gray-900 dark:text-gray-100 tracking-tight">Task Details</h2>
+        <h2 className="font-bold text-gray-900 dark:text-gray-100 tracking-tight">
+          {selectedNodeData.type === 'groupNode' ? 'Group Details' : 'Task Details'}
+        </h2>
         <button
           onClick={handleClose}
           className="p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-all active:scale-90"
@@ -281,7 +283,94 @@ const Sidebar = ({ onMinimize }) => {
         </button>
       </div>
 
-      {/* Form */}
+      {/* Group node: simplified form — title + description only */}
+      {selectedNodeData.type === 'groupNode' ? (
+        <div className="flex-1 overflow-y-auto p-6 space-y-5">
+          {/* Group icon badge */}
+          <div className="flex items-center gap-3 p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-800/30">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-indigo-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" strokeDasharray="4 4" />
+            </svg>
+            <div>
+              <p className="text-xs font-bold text-indigo-700 dark:text-indigo-300">Group Container</p>
+              <p className="text-[11px] text-indigo-500 dark:text-indigo-400">
+                {nodes.filter(n => n.data.parentId === selectedNode).length} task(s) inside
+              </p>
+            </div>
+          </div>
+
+          {/* Title */}
+          <div className="space-y-1.5">
+            <label className="block text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Title</label>
+            <textarea
+              ref={titleRef}
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              rows={1}
+              className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all shadow-sm text-sm font-bold text-gray-800 dark:text-gray-100 resize-none overflow-hidden leading-relaxed min-h-[42px]"
+              placeholder="Group name..."
+            />
+          </div>
+
+          {/* Description */}
+          <div className="space-y-1.5">
+            <label className="block text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Description</label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              rows={3}
+              className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-none shadow-sm text-sm text-gray-600 dark:text-gray-400 leading-relaxed"
+              placeholder="What does this group represent?"
+            />
+          </div>
+
+          {/* Status: auto-computed from children */}
+          <div className="space-y-1.5">
+            <label className="block text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Status (auto)</label>
+            {(() => {
+              const children = nodes.filter(n => n.data.parentId === selectedNode);
+              const total = children.length;
+              if (total === 0) return <p className="text-xs text-gray-400">No children yet</p>;
+              const done = children.filter(n => n.data.status === 'done').length;
+              const inProgress = children.filter(n => n.data.status === 'in-progress').length;
+              const pct = Math.round((done / total) * 100);
+              return (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                    <span>{done}/{total} done</span>
+                    {inProgress > 0 && <span>{inProgress} in progress</span>}
+                    <span className="font-bold text-indigo-600 dark:text-indigo-400">{pct}%</span>
+                  </div>
+                  <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="h-full bg-indigo-500 rounded-full transition-all duration-300"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Ungroup button */}
+          <div className="pt-4 border-t border-gray-100 dark:border-gray-700/50">
+            <button
+              onClick={() => { ungroupTasks(selectedNode); setSelectedNode(null); }}
+              className="w-full px-4 py-2 text-sm font-bold text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/40 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-all active:scale-95"
+            >
+              Ungroup
+            </button>
+          </div>
+
+          <div className="pt-2 flex items-center justify-between text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+            <span>Created</span>
+            <span>{new Date(selectedNodeData.data.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+          </div>
+        </div>
+      ) : (
+      /* Task node: full form */
       <div className="flex-1 overflow-y-auto p-6 space-y-5">
         {/* Title */}
         <div className="space-y-1.5">
@@ -479,6 +568,7 @@ const Sidebar = ({ onMinimize }) => {
           <span>{new Date(selectedNodeData.data.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
         </div>
       </div>
+      )}
     </div>
   );
 };

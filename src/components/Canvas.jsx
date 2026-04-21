@@ -10,6 +10,7 @@ import {
 } from '@xyflow/react';
 import { useStore, useTemporalStore } from '../store/useStore';
 import TaskNode from './TaskNode';
+import GroupNode from './GroupNode';
 import Toolbar from './Toolbar';
 import Sidebar from './Sidebar';
 import MobileTaskToolbar from './MobileTaskToolbar';
@@ -19,6 +20,7 @@ import { calculateCumulativeTimes } from '../utils/timeUtils';
 // Define custom node types
 const nodeTypes = {
   taskNode: TaskNode,
+  groupNode: GroupNode,
 };
 
 // Default edge options
@@ -188,48 +190,129 @@ const Canvas = () => {
 
   // Sync our selectedNodes with React Flow's selection state and add frontier info
   // Frontier info shown for all selected nodes; time info only for single selection
-  const nodesWithSelection = useMemo(() => nodes.map((node) => {
-    // Calculate z-index based on y position: nodes lower on canvas appear in front
-    // Base: 100, add y position scaled down to avoid huge numbers
-    // Selected nodes get +10000 to always be on top
-    const baseZIndex = 100 + Math.floor(node.position.y / 10);
-    const zIndex = node.selected ? baseZIndex + 10000 : baseZIndex;
-    
-    return {
-      ...node,
-      zIndex,
-      // Note: selected state is now managed directly in the store's nodes array
-      // to avoid infinite update loops with onSelectionChange.
-      data: {
-        ...node.data,
-        isFrontier: frontierTasks.has(node.id),
-        cumulativeTime: cumulativeTimes.get(node.id),
-        showQuestionMark: cumulativeTimes.get(node.id)?.showQuestionMark || false,
-      },
-    };
-  }), [nodes, frontierTasks, cumulativeTimes]);
+  const nodesWithSelection = useMemo(() => {
+    const GROUP_PADDING = 30;
+    const GROUP_HEADER = 44; // px reserved for the title header strip
 
-  // Style edges based on source node status
-  const edgesWithStyle = edges.map((edge) => {
-    const sourceNode = nodes.find((n) => n.id === edge.source);
-    const isDone = sourceNode?.data?.status === 'done';
-    const isSomeday = sourceNode?.data?.status === 'someday';
-    const isSelected = edge.selected;
-    
-    return {
-      ...edge,
-      zIndex: isSelected ? 50 : 0, // Ensure edges stay below nodes (which are 100+)
-      animated: animationsEnabled && (isSelected || (!isDone && !isSomeday)),
-      style: {
-        strokeWidth: isSelected ? 3 : 2,
-        stroke: isSelected 
-          ? (darkMode ? '#c084fc' : '#a855f7') 
-          : ((isDone || isSomeday) ? '#9ca3af' : '#6366f1'),
-        opacity: isSelected ? 1 : ((isDone || isSomeday) ? 0.4 : 1),
-        strokeDasharray: !animationsEnabled || ((isDone || isSomeday) && !isSelected) ? '5,5' : undefined,
-      },
+    // Filter out nodes whose parent group is collapsed
+    const visibleNodes = nodes.filter(node => {
+      if (!node.data.parentId) return true;
+      const parent = nodes.find(n => n.id === node.data.parentId);
+      return !parent?.data?.isCollapsed;
+    });
+
+    return visibleNodes.map((node) => {
+      if (node.type === 'groupNode') {
+        const isCollapsed = node.data.isCollapsed;
+        const zIndex = node.selected ? 10010 : 10; // always behind task nodes
+
+        if (isCollapsed) {
+          // Fixed collapsed pill size
+          return {
+            ...node,
+            zIndex,
+            draggable: false,
+            style: { width: 200, height: 70 },
+            data: { ...node.data, isFrontier: frontierTasks.has(node.id) },
+          };
+        }
+
+        // Expanded: auto-size to cover children
+        const children = nodes.filter(n => n.data.parentId === node.id);
+        if (children.length > 0) {
+          const minX = Math.min(...children.map(n => n.position.x));
+          const minY = Math.min(...children.map(n => n.position.y));
+          const maxX = Math.max(...children.map(n => n.position.x + (n.measured?.width ?? 200)));
+          const maxY = Math.max(...children.map(n => n.position.y + (n.measured?.height ?? 80)));
+
+          return {
+            ...node,
+            position: { x: minX - GROUP_PADDING, y: minY - GROUP_PADDING - GROUP_HEADER },
+            style: {
+              width: maxX - minX + GROUP_PADDING * 2,
+              height: maxY - minY + GROUP_PADDING * 2 + GROUP_HEADER,
+            },
+            zIndex,
+            draggable: false,
+            data: { ...node.data, isFrontier: frontierTasks.has(node.id) },
+          };
+        }
+
+        // Group with no children: show a placeholder size
+        return {
+          ...node,
+          zIndex,
+          draggable: false,
+          style: { width: 220, height: 120 },
+          data: { ...node.data, isFrontier: frontierTasks.has(node.id) },
+        };
+      }
+
+      // Regular task node
+      const baseZIndex = 100 + Math.floor(node.position.y / 10);
+      const zIndex = node.selected ? baseZIndex + 10000 : baseZIndex;
+
+      return {
+        ...node,
+        zIndex,
+        data: {
+          ...node.data,
+          isFrontier: frontierTasks.has(node.id),
+          cumulativeTime: cumulativeTimes.get(node.id),
+          showQuestionMark: cumulativeTimes.get(node.id)?.showQuestionMark || false,
+        },
+      };
+    });
+  }, [nodes, frontierTasks, cumulativeTimes]);
+
+  // Style edges, rerouting cross-boundary edges when a group is collapsed
+  const edgesWithStyle = useMemo(() => {
+    // Build a lookup: collapsed group IDs
+    const collapsedGroupIds = new Set(
+      nodes.filter(n => n.type === 'groupNode' && n.data.isCollapsed).map(n => n.id)
+    );
+
+    // If a node is a child of a collapsed group, return the group id; otherwise return the node id
+    const effectiveId = (nodeId) => {
+      const node = nodes.find(n => n.id === nodeId);
+      if (node?.data?.parentId && collapsedGroupIds.has(node.data.parentId)) {
+        return node.data.parentId;
+      }
+      return nodeId;
     };
-  });
+
+    return edges.map((edge) => {
+      const effSource = effectiveId(edge.source);
+      const effTarget = effectiveId(edge.target);
+
+      // Internal edge inside a collapsed group — hide it
+      if (effSource === effTarget) return null;
+
+      const sourceNode = nodes.find((n) => n.id === edge.source);
+      const isDone = sourceNode?.data?.status === 'done';
+      const isSomeday = sourceNode?.data?.status === 'someday';
+      const isSelected = edge.selected;
+
+      return {
+        ...edge,
+        source: effSource,
+        target: effTarget,
+        // Clear handle IDs when remapped, so React Flow uses default handles on the group node
+        sourceHandle: effSource !== edge.source ? null : edge.sourceHandle,
+        targetHandle: effTarget !== edge.target ? null : edge.targetHandle,
+        zIndex: isSelected ? 50 : 0,
+        animated: animationsEnabled && (isSelected || (!isDone && !isSomeday)),
+        style: {
+          strokeWidth: isSelected ? 3 : 2,
+          stroke: isSelected
+            ? (darkMode ? '#c084fc' : '#a855f7')
+            : ((isDone || isSomeday) ? '#9ca3af' : '#6366f1'),
+          opacity: isSelected ? 1 : ((isDone || isSomeday) ? 0.4 : 1),
+          strokeDasharray: !animationsEnabled || ((isDone || isSomeday) && !isSelected) ? '5,5' : undefined,
+        },
+      };
+    }).filter(Boolean);
+  }, [edges, nodes, darkMode, animationsEnabled]);
 
   // Get center of current viewport for adding new tasks
   const getViewportCenter = useCallback(() => {

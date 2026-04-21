@@ -100,6 +100,18 @@ export const findFrontierTasks = (selectedTaskId, nodes, edges) => {
     const ancestorNode = nodes.find(node => node.id === ancestorId);
     
     if (!ancestorNode) return;
+
+    // Handle group nodes: if we hit a group node (either because it was targeted directly 
+    // or as a rerouted edge in collapsed state), treat it as an actionable frontier if it's collapsed.
+    if (ancestorNode.type === 'groupNode') {
+      if (ancestorNode.data.isCollapsed) {
+        // For groups, status is tracked in its data. Determine if "done" or not
+        if (ancestorNode.data.status !== 'done' && ancestorNode.data.status !== 'someday' && isTaskExecutable(ancestorId, edges, nodes)) {
+          frontierTasks.add(ancestorId);
+        }
+      }
+      return; // Stop traversal at collapsed group as a single unit or handle expanded group transparently
+    }
     
     // Check if this ancestor is a frontier task:
     // 1. Not completed or someday
