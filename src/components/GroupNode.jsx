@@ -46,8 +46,11 @@ const GroupNode = ({ id, data, selected }) => {
         `}
       />
 
-      {/* Header strip — always interactive */}
-      <div className="absolute top-0 left-0 right-0 pointer-events-auto flex items-center justify-between px-3 py-2 z-10">
+      {/* Header strip — always interactive; stop double-click so it doesn't trigger pane add-node */}
+      <div
+        className="absolute top-0 left-0 right-0 pointer-events-auto flex items-center justify-between px-3 py-2 z-10"
+        onDoubleClick={e => e.stopPropagation()}
+      >
         <div className="flex items-center gap-1.5">
           <button
             onClick={handleToggle}
@@ -79,10 +82,10 @@ const GroupNode = ({ id, data, selected }) => {
         </button>
       </div>
 
-      {/* Collapsed label */}
-      {isCollapsed && (
-        <div className="absolute inset-0 flex items-center justify-center mt-6 pointer-events-none">
-          <span className="text-xs text-indigo-500 dark:text-indigo-400 font-medium">Collapsed</span>
+      {/* Collapsed label: show description if set */}
+      {isCollapsed && data.description && (
+        <div className="absolute inset-0 flex items-center justify-center mt-6 px-3 pointer-events-none">
+          <span className="text-xs text-indigo-500 dark:text-indigo-400 line-clamp-2 text-center">{data.description}</span>
         </div>
       )}
     </div>

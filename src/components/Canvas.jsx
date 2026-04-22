@@ -208,9 +208,10 @@ const Canvas = () => {
     return visibleNodes.map((node) => {
       if (node.type === 'groupNode') {
         const isCollapsed = node.data.isCollapsed;
-        const zIndex = node.selected ? 10010 : 10; // always behind task nodes
 
         if (isCollapsed) {
+          // Collapsed groups can be raised when selected — they don't contain clickable children
+          const zIndex = node.selected ? 10010 : 10;
           return {
             ...node,
             zIndex,
@@ -220,9 +221,13 @@ const Canvas = () => {
           };
         }
 
+        // Expanded groups: NEVER raise zIndex even when selected.
+        // Task nodes sit at zIndex ~100-200; keeping the group at 10 ensures
+        // task nodes always receive pointer events (clicks/drags) above the group wrapper.
+        const zIndex = 10;
+
         // Expanded: use stored position as the group's top-left anchor;
         // expand the size rightward/downward to cover all children.
-        // The stored position is kept canonical so the group is freely draggable.
         const children = nodes.filter(n => n.data.parentId === node.id);
         if (children.length > 0) {
           const maxRight  = Math.max(...children.map(n => n.position.x + (n.measured?.width  ?? 200)));
