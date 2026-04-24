@@ -444,8 +444,8 @@ export const useStore = create(
         },
 
         toggleGroupCollapsed: (groupId) => {
-          const GROUP_PADDING = 30;
-          const GROUP_HEADER = 44;
+          const COLLAPSED_WIDTH = 200;
+          const COLLAPSED_HEIGHT = 70;
           const nodes = get().nodes;
           const groupNode = nodes.find(n => n.id === groupId);
           if (!groupNode) return;
@@ -462,19 +462,23 @@ export const useStore = create(
           if (children.length > 0) {
             const minX = Math.min(...children.map(n => n.position.x));
             const minY = Math.min(...children.map(n => n.position.y));
-            // The canonical group position derived from current children layout
-            const childrenBasedPos = { x: minX - GROUP_PADDING, y: minY - GROUP_HEADER - GROUP_PADDING };
+            const maxRight  = Math.max(...children.map(n => n.position.x + (n.measured?.width  ?? 200)));
+            const maxBottom = Math.max(...children.map(n => n.position.y + (n.measured?.height ?? 80)));
+            // Collapsed group appears centered over the children bounding box
+            const centerBasedPos = {
+              x: (minX + maxRight)  / 2 - COLLAPSED_WIDTH  / 2,
+              y: (minY + maxBottom) / 2 - COLLAPSED_HEIGHT / 2,
+            };
 
             if (willCollapse) {
-              // Save computed position so collapsed group appears over children
               updatedNodes = updatedNodes.map(n =>
-                n.id === groupId ? { ...n, position: childrenBasedPos } : n
+                n.id === groupId ? { ...n, position: centerBasedPos } : n
               );
             } else {
               // On expand: move children to align with the group's current stored position
               // (handles case where collapsed group was dragged)
-              const dx = groupNode.position.x - childrenBasedPos.x;
-              const dy = groupNode.position.y - childrenBasedPos.y;
+              const dx = groupNode.position.x - centerBasedPos.x;
+              const dy = groupNode.position.y - centerBasedPos.y;
               if (dx !== 0 || dy !== 0) {
                 updatedNodes = updatedNodes.map(n =>
                   n.data.parentId === groupId
