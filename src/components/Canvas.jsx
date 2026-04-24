@@ -238,9 +238,13 @@ const Canvas = () => {
             style: {
               width:  Math.max(220, maxRight  - node.position.x + GROUP_PADDING),
               height: Math.max(130, maxBottom - node.position.y + GROUP_PADDING),
+              // Override RF's pointer-events:all so task nodes inside always receive clicks.
+              // RF spreads node.style last, so this wins over RF's default.
+              pointerEvents: 'none',
             },
             zIndex,
             draggable: true,
+            dragHandle: '.group-drag-handle', // drag only via header
             data: { ...node.data, isFrontier: frontierTasks.has(node.id) },
           };
         }
@@ -250,13 +254,16 @@ const Canvas = () => {
           ...node,
           zIndex,
           draggable: true,
-          style: { width: 220, height: 120 },
+          dragHandle: '.group-drag-handle',
+          style: { width: 220, height: 120, pointerEvents: 'none' },
           data: { ...node.data, isFrontier: frontierTasks.has(node.id) },
         };
       }
 
-      // Regular task node
-      const baseZIndex = 100 + Math.floor(node.position.y / 10);
+      // Regular task node.
+      // Clamp to min 20 so nodes with large negative y-coords (e.g. y=-3000 → raw=-200)
+      // are always above expanded group wrappers (z=10) and never intercept their clicks.
+      const baseZIndex = Math.max(20, 100 + Math.floor(node.position.y / 10));
       const zIndex = node.selected ? baseZIndex + 10000 : baseZIndex;
 
       return {

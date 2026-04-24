@@ -6,6 +6,9 @@ const GroupNode = ({ id, data, selected }) => {
   const toggleGroupCollapsed = useStore((state) => state.toggleGroupCollapsed);
   const ungroupTasks = useStore((state) => state.ungroupTasks);
   const darkMode = useStore((state) => state.darkMode);
+  const setSelectedNode = useStore((state) => state.setSelectedNode);
+  const setSelectedNodes = useStore((state) => state.setSelectedNodes);
+  const selectedNodes = useStore((state) => state.selectedNodes);
   const isCollapsed = data.isCollapsed;
 
   const handleToggle = (e) => {
@@ -16,6 +19,21 @@ const GroupNode = ({ id, data, selected }) => {
   const handleUngroup = (e) => {
     e.stopPropagation();
     ungroupTasks(id);
+  };
+
+  // For expanded groups the RF wrapper has pointer-events:none, so we handle
+  // selection here. stopPropagation prevents onNodeClick from double-firing.
+  const handleHeaderClick = (e) => {
+    e.stopPropagation();
+    if (e.metaKey || e.ctrlKey) {
+      if (selectedNodes.includes(id)) {
+        setSelectedNodes(selectedNodes.filter(nid => nid !== id));
+      } else {
+        setSelectedNodes([...selectedNodes, id]);
+      }
+    } else {
+      setSelectedNode(id);
+    }
   };
 
   return (
@@ -36,20 +54,24 @@ const GroupNode = ({ id, data, selected }) => {
         className="!w-3 !h-3 !bg-indigo-500 !border-2 !border-white dark:!border-gray-900 pointer-events-auto"
       />
 
-      {/* Visible container border */}
+      {/* Visible container border — always pointer-events-auto so the dashed ring is clickable.
+          For expanded groups this also acts as a selection target (RF wrapper is pointer-events:none). */}
       <div
         className={`
           w-full h-full rounded-2xl border-2 border-dashed transition-colors duration-200
+          pointer-events-auto
           ${darkMode ? 'bg-indigo-900/10 border-indigo-500/30' : 'bg-indigo-500/5 border-indigo-500/20'}
           ${selected ? 'border-solid ring-2 ring-indigo-500 ring-offset-2 ring-offset-white dark:ring-offset-gray-900' : ''}
-          ${isCollapsed ? 'pointer-events-auto' : ''}
+          ${!isCollapsed ? 'cursor-pointer' : ''}
         `}
+        onClick={!isCollapsed ? (e) => { e.stopPropagation(); handleHeaderClick(e); } : undefined}
       />
 
-      {/* Header strip — always interactive; stop double-click so it doesn't trigger pane add-node */}
+      {/* Header strip — interactive, drag handle, and selection target for expanded groups */}
       <div
-        className="absolute top-0 left-0 right-0 pointer-events-auto flex items-center justify-between px-3 py-2 z-10"
+        className={`absolute top-0 left-0 right-0 pointer-events-auto group-drag-handle flex items-center justify-between px-3 py-2 z-10 ${!isCollapsed ? 'cursor-grab active:cursor-grabbing' : ''}`}
         onDoubleClick={e => e.stopPropagation()}
+        onClick={!isCollapsed ? handleHeaderClick : undefined}
       >
         <div className="flex items-center gap-1.5">
           <button
