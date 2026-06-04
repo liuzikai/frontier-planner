@@ -433,7 +433,7 @@ export const useStore = create(
               data: {
                 ...n.data,
                 primaryTag: n.data.primaryTag === id ? null : n.data.primaryTag,
-                tags: n.data.tags.filter(tid => tid !== id)
+                tags: (n.data.tags || []).filter(tid => tid !== id)
               }
             })),
             isDirty: true,
