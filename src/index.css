@@ -146,3 +146,11 @@ textarea,
 .pan-mode .react-flow__pane:active {
   cursor: grabbing;
 }
+
+/* Hide React Flow's built-in multi-selection bounding box.
+   Selection is tracked in the store and shown via each node's own
+   highlight, so this default box only lingers after a box selection. */
+.react-flow__nodesselection,
+.react-flow__nodesselection-rect {
+  display: none !important;
+}
